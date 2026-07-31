@@ -80,6 +80,16 @@ const handlePlaceOrder = async () => {
             />
           </div>
           <div class="sm:col-span-2 space-y-1.5">
+            <label class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">M-Pesa Number</label>
+            <input
+              v-model="store.shippingDetails.phone"
+              type="tel"
+              class="w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500"
+              placeholder="e.g. 0712 345 678"
+              required
+            />
+          </div>
+          <div class="sm:col-span-2 space-y-1.5">
             <label class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">Address</label>
             <input 
               v-model="store.shippingDetails.address" 
@@ -204,7 +214,7 @@ const handlePlaceOrder = async () => {
           :disabled="store.isSubmittingOrder || store.cart.length === 0"
           class="w-full flex items-center justify-center gap-2 py-4 bg-gold-600 hover:bg-gold-500 dark:bg-gold-600 dark:hover:bg-gold-500 text-white font-mono uppercase text-xs tracking-widest rounded-md shadow-md transition-all active:scale-95"
         >
-          {{ store.isSubmittingOrder ? 'Saving order…' : `Place Delivery Order — KES ${store.cartTotal.toFixed(2)} →` }}
+          {{ store.isSubmittingOrder ? 'Sending M-Pesa prompt…' : `Pay with M-Pesa — KES ${store.cartTotal.toFixed(2)} →` }}
         </button>
 
         <!-- Back link -->

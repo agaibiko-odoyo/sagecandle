@@ -409,28 +409,29 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     isSubmittingOrder.value = true;
     orderError.value = null;
 
-    const { data, error } = await supabase.rpc('create_delivery_order', {
-      p_customer_name: `${shippingDetails.value.firstName} ${shippingDetails.value.lastName}`.trim(),
-      p_customer_email: shippingDetails.value.email,
-      p_customer_phone: shippingDetails.value.phone,
-      p_address: shippingDetails.value.address,
-      p_city: shippingDetails.value.city,
-      p_postal_code: shippingDetails.value.postalCode,
-      p_delivery_notes: shippingDetails.value.deliveryNotes,
-      p_delivery_method_id: selectedDeliveryMethodId.value,
-      p_items: cartDetailedItems.value.map(({ product, quantity }) => ({
-        product_id: product.id,
-        quantity
-      }))
-    });
-
-    if (error || !data?.[0]) {
-      orderError.value = error?.message || 'We could not save your order. Please try again.';
+    if (!shippingDetails.value.phone.trim()) {
+      orderError.value = 'Enter the M-Pesa number you want to pay with.';
       isSubmittingOrder.value = false;
       return;
     }
 
-    const orderId = data[0].order_number;
+    const response = await fetch('/api/mpesa/initiate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        shippingDetails: shippingDetails.value,
+        deliveryMethodId: selectedDeliveryMethodId.value,
+        items: cart.value
+      })
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || !result.orderId) {
+      orderError.value = result.error || 'We could not start the M-Pesa payment. Please try again.';
+      isSubmittingOrder.value = false;
+      return;
+    }
+
+    const orderId = result.orderId;
     const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
     const dateStr = new Date().toLocaleDateString('en-US', options);
 
@@ -443,7 +444,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       total: cartTotal.value,
       shippingDetails: { ...shippingDetails.value },
       deliveryMethod: { ...selectedDeliveryMethod.value },
-      paymentMethod: 'card'
+      paymentMethod: 'mobile_pay'
     };
 
     activeOrder.value = newOrder;
