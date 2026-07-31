@@ -162,13 +162,14 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       category: 'candles',
       price: 85.00,
       image: vanilla,
-      description: 'Meet Ivory Vanilla — soft, warm & irresistibly addictive. A creamy vanilla scent wrapped in pure comfort. Think cozy nights, clean sheets, warm hugs, and that “what smells so good?” moment. ✨ Light it. Let the room glow. Let the scent linger. 🕯️🤍',
+      description: 'Meet Ivory Vanilla — soft, warm & irresistibly addictive. A creamy vanilla scent wrapped in pure comfort. Think cozy nights, clean sheets, warm hugs, and that “what smells so good?” moment. Light it. Let the room glow. Let the scent linger.',
+      cardDescription: 'Inspired by soft luxury, warm embraces, and the sweet comfort of vanilla.',
       collection: 'Scented Memories',
       tag: 'Ancient Rituals',
       details: [
-        '✨ Self-care',
-        '🎁 Gifting',
-        '🤍 Making everyday moments feel special'
+        'Self-care',
+        'Gifting',
+        'Making everyday moments feel special'
       ],
       specifications: {
         'Weight': '250g',
@@ -184,14 +185,15 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       category: 'candles',
       price: 88.00,
       image: bubblegum,
-      description: '🍬🎀 Your childhood favorite just got a luxury upgrade. Meet Sweet Reverie Bubblegum — sweet, playful, and irresistibly nostalgic. 🫧💗 One light and your space transforms into a candy-sweet dream. Think bubblegum, carefree moments, soft-girl energy, and the kind of scent that makes everyone ask: “Wait… what smells THAT good?” 👀✨',
+      description: 'Your childhood favorite just got a luxury upgrade. Meet Sweet Reverie Bubblegum — sweet, playful, and irresistibly nostalgic. One light and your space transforms into a candy-sweet dream. Think bubblegum, carefree moments, soft-girl energy, and the kind of scent that makes everyone ask: “Wait… what smells THAT good?”',
+      cardDescription: 'Inspired by playful sweetness, carefree moments, and the nostalgic joy of bubblegum.',
       collection: 'Scented Memories',
       tag: 'Ancient Rituals',
       details: [
-        '🎀 Girls’ nights & sleepovers',
-        '💗 Romanticizing your space',
-        '🫧 Self-care Sundays',
-        '🎁 Gifting your favorite sweet girl'
+        'Girls’ nights & sleepovers',
+        'Romanticizing your space',
+        'Self-care Sundays',
+        'Gifting your favorite sweet girl'
       ],
       specifications: {
         'Weight': '220g',
@@ -206,13 +208,14 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       category: 'candles',
       price: 95.00,
       image: caramel,
-      description: '🍯✨ WARNING: Golden Caramel is dangerously addictive. Sweet, buttery caramel with a rich, cozy warmth that makes your space smell like pure indulgence. 🤎 Imagine warm desserts, golden evenings, soft blankets, and that luxurious feeling of having everything just right. 🕯️✨',
+      description: 'WARNING: Golden Caramel is dangerously addictive. Sweet, buttery caramel with a rich, cozy warmth that makes your space smell like pure indulgence. Imagine warm desserts, golden evenings, soft blankets, and that luxurious feeling of having everything just right.',
+      cardDescription: 'Inspired by golden moments, warm sweetness, and irresistible caramel indulgence.',
       collection: 'Scented Memories',
       tag: 'Woven Memories',
       details: [
-        '🤎 Treating yourself',
-        '🎁 Gifting someone their new favorite scent',
-        '✨ Making your space unforgettable'
+        'Treating yourself',
+        'Gifting someone their new favorite scent',
+        'Making your space unforgettable'
       ],
       specifications: {
         'Weight': '300g',
@@ -228,13 +231,13 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       category: 'candles',
       price: 950.00,
       image: cubeCandles,
-      description: 'Small candle. BIG personality. ✨ Meet our Mini Cute Cube Candle — tiny, adorable, and made to add the perfect little touch of luxury to any space. 🤍 Whether you’re styling your bedside table, gifting your bestie, decorating your vanity, or simply treating yourself… this little cutie belongs in your collection.',
+      description: 'Small candle. BIG personality. Meet our Mini Cute Cube Candle — tiny, adorable, and made to add the perfect little touch of luxury to any space. Whether you’re styling your bedside table, gifting your bestie, decorating your vanity, or simply treating yourself… this little cutie belongs in your collection.',
       collection: 'Scented Memories',
       tag: 'Decadent Scents',
       details: [
-        '✨ Cute displays',
-        '🕯️ Cozy moments',
-        '🎁 Gifting loved ones'
+        'Cute displays',
+        'Cozy moments',
+        'Gifting loved ones'
       ],
       specifications: {
         'Weight': '280g',

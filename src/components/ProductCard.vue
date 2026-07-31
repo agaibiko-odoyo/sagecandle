@@ -87,7 +87,7 @@ const handleAddToCart = (e: Event) => {
           {{ product.name }}
         </h3>
         <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400 line-clamp-2 leading-relaxed">
-          {{ product.description }}
+          {{ product.cardDescription || product.description }}
         </p>
       </div>
 

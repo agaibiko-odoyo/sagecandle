@@ -5,6 +5,7 @@ export interface Product {
   price: number;
   image: string;
   description: string;
+  cardDescription?: string;
   collection: string;
   tag: string;
   details: string[];

@@ -40,7 +40,7 @@ const viewCollection = (filter: 'candles' | 'textiles' | 'pottery') => store.nav
           class="mx-auto h-28 w-28 rounded-full object-cover shadow-2xl ring-1 ring-white/40 md:h-36 md:w-36"
         />
         <span class="text-xs font-mono tracking-[0.3em] text-gold-400 uppercase inline-block animate-pulse">
-          ★ Established in Heritage ★
+          Established in Heritage
         </span>
         
         <h1 class="font-serif text-4xl font-bold leading-[1.2] tracking-[-0.02em] text-white md:text-6xl lg:text-7xl md:leading-[1.1]">
