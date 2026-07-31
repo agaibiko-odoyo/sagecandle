@@ -13,11 +13,13 @@ const props = defineProps<{
 const store = useHeritageStore();
 
 const viewProduct = () => {
+  if (!props.product.isAvailable) return;
   store.openProduct(props.product);
 };
 
 const handleAddToCart = (e: Event) => {
   e.stopPropagation();
+  if (!props.product.isAvailable) return;
   store.addToCart(props.product.id);
   // Optional: provide dynamic visual haptic feedback or state
 };
@@ -27,7 +29,8 @@ const handleAddToCart = (e: Event) => {
   <div 
     :id="'product-card-' + product.id"
     @click="viewProduct"
-    class="group cursor-pointer overflow-hidden rounded-lg bg-white/40 dark:bg-luxe-gray/40 border border-gold-200/40 dark:border-gold-900/30 backdrop-blur-sm transition-all duration-500 hover:border-gold-400 dark:hover:border-gold-600 hover:shadow-xl"
+    :class="product.isAvailable ? 'group cursor-pointer hover:border-gold-400 dark:hover:border-gold-600 hover:shadow-xl' : 'cursor-not-allowed opacity-70 grayscale'"
+    class="overflow-hidden rounded-lg bg-white/40 dark:bg-luxe-gray/40 border border-gold-200/40 dark:border-gold-900/30 backdrop-blur-sm transition-all duration-500"
   >
     <!-- Image section with overlay -->
     <div class="relative aspect-square w-full overflow-hidden bg-gold-50 dark:bg-neutral-900">
@@ -46,9 +49,13 @@ const handleAddToCart = (e: Event) => {
         New Release
       </span>
 
+      <span v-if="!product.isAvailable" class="absolute top-4 left-4 text-[10px] tracking-widest font-mono uppercase bg-neutral-900 text-white px-2 py-0.5 rounded-sm shadow-md">
+        Coming Soon
+      </span>
+
       <!-- Hover Action Overlay -->
-      <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
-        <button 
+      <div v-if="product.isAvailable" class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
+        <button
           @click.stop="viewProduct"
           class="p-3 bg-white dark:bg-neutral-900 rounded-full text-gold-600 hover:text-white hover:bg-gold-500 transition-colors shadow-lg"
           aria-label="View Details"
@@ -88,12 +95,13 @@ const handleAddToCart = (e: Event) => {
         <span class="font-mono text-base font-semibold text-neutral-900 dark:text-neutral-100">
           KES {{ product.price.toFixed(2) }}
         </span>
-        <button 
+        <button v-if="product.isAvailable"
           @click.stop="handleAddToCart"
           class="text-xs font-mono tracking-widest text-gold-700 dark:text-gold-400 uppercase hover:text-gold-500 transition-colors"
         >
           + Add to Bag
         </button>
+        <span v-else class="text-xs font-mono tracking-widest text-neutral-400 uppercase">Coming Soon</span>
       </div>
     </div>
   </div>

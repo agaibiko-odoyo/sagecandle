@@ -14,7 +14,7 @@ const store = useHeritageStore();
 // Recommendations
 const recommendations = computed(() => {
   const cartIds = store.cart.map(item => item.productId);
-  return store.products.filter(p => !cartIds.includes(p.id)).slice(0, 2);
+  return store.products.filter(p => p.isAvailable && !cartIds.includes(p.id)).slice(0, 2);
 });
 
 const handleQuantityChange = (productId: string, quantity: number) => {

@@ -10,6 +10,7 @@ export interface Product {
   details: string[];
   specifications: Record<string, string>;
   isNew?: boolean;
+  isAvailable: boolean;
 }
 
 export interface Artisan {
