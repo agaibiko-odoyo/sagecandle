@@ -7,13 +7,13 @@ import img8 from '../../assets/img8.jpeg';
 import img9 from '../../assets/img9.jpeg';
 import img10 from '../../assets/img10.jpeg';
 import img11 from '../../assets/img11.jpeg';
-import img12 from '../../assets/img12.jpeg';
 import img13 from '../../assets/img13.jpeg';
 import img14 from '../../assets/img14.jpeg';
 import vanilla from '../../assets/vanilla.jpeg';
 import bubblegum from '../../assets/bubblegum.jpeg';
 import caramel from '../../assets/caramel.jpeg';
 import cubeCandles from '../../assets/cubecandles.jpeg';
+import blueberry from '../../assets/blueberry.jpeg';
 
 export type AppView = 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'checkout' | 'confirmation' | 'tracking' | 'shipment';
 type CollectionFilter = 'all' | Product['category'];
@@ -334,25 +334,23 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     },
     {
       id: 'royal-triptych',
-      name: 'Quiet Woods',
-      category: 'textiles',
+      name: 'Midnight Blue',
+      category: 'candles',
       price: 0,
-      image: img12,
-      description: 'A decadent candle featuring single-origin dark cacao, wild honey, and warm indigenous spices. Hand-poured into a gorgeous amber glass jar.',
-      collection: 'Aromatic Travel Tins',
+      image: blueberry,
+      description: 'Meet Midnight Blue — your new midnight obsession. Sweet, juicy blueberry wrapped in a deep, dreamy aroma that turns your space into a whole mood. Think late-night conversations, soft music, dim lights, and a little mystery.',
+      collection: 'Scented Memories',
       tag: 'Decadent Scents',
       details: [
-        'Burn time: 45 hours',
-        'Natural soy wax blend',
-        'Hand-polished premium glass',
-        'Lead-free natural cotton wick'
+        'Deep & dreamy nights',
+        'Setting the mood'
       ],
       specifications: {
         'Weight': '180g',
-        'Notes': 'Dark Cacao, Wild Honey, Grains of Paradise, Cloves',
+        'Notes': 'Juicy Blueberry, Midnight Amber, Soft Vanilla',
         'Origin': 'Mombasa, Kenya'
       },
-      isAvailable: false
+      isAvailable: true
     },
     {
       id: 'beaded-choker',

@@ -19,9 +19,9 @@ const activeFilter = computed({
 
 const filteredProducts = computed(() => {
   if (activeFilter.value === 'all') {
-    return store.products;
+    return [...store.products].sort((a, b) => Number(b.isAvailable) - Number(a.isAvailable));
   }
-  return store.products.filter(p => p.category === activeFilter.value);
+  return store.products.filter(p => p.category === activeFilter.value).sort((a, b) => Number(b.isAvailable) - Number(a.isAvailable));
 });
 
 // Description maps for category header sections
