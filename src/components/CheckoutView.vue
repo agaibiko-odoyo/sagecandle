@@ -1,17 +1,24 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { useHeritageStore } from '../stores/heritageStore';
 import { ArrowLeft, Wallet } from 'lucide-vue-next';
 
 const store = useHeritageStore();
+const shippingForm = ref<HTMLFormElement | null>(null);
 
 const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'checkout' | 'confirmation') => store.navigateTo(view);
 
 const handlePlaceOrder = async () => {
-  const fields = ['firstName', 'lastName', 'email', 'phone', 'address', 'city', 'postalCode', 'mpesaReference'] as const;
-  for (const field of fields) {
-    const input = document.querySelector<HTMLInputElement>(`input[name="${field}"]`);
-    if (input?.value) store.shippingDetails[field] = field === 'mpesaReference' ? input.value.toUpperCase() : input.value;
+  if (shippingForm.value) {
+    const formData = new FormData(shippingForm.value);
+    const fields = ['firstName', 'lastName', 'email', 'phone', 'address', 'city', 'postalCode'] as const;
+    for (const field of fields) {
+      const value = formData.get(field);
+      if (typeof value === 'string') store.shippingDetails[field] = value;
+    }
   }
+  const mpesaInput = document.querySelector<HTMLInputElement>('input[name="mpesaReference"]');
+  if (mpesaInput) store.shippingDetails.mpesaReference = mpesaInput.value.toUpperCase();
   await store.placeOrder();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
@@ -63,7 +70,7 @@ const handlePlaceOrder = async () => {
         </div>
 
         <!-- Form fields (prefilled Kwame Mensah) -->
-        <form @submit.prevent class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <form ref="shippingForm" @submit.prevent class="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div class="space-y-1.5">
             <label class="shipping-label text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">First Name</label>
             <input 

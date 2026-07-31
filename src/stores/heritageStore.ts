@@ -552,8 +552,17 @@ export const useHeritageStore = defineStore('heritageStore', () => {
   const placeOrder = async () => {
     if (!catalogueLoaded.value || cart.value.length === 0) return;
 
-    if (!shippingDetails.value.firstName.trim() || !shippingDetails.value.lastName.trim() || !shippingDetails.value.address.trim() || !shippingDetails.value.city.trim() || !/^\S+@\S+\.\S+$/.test(shippingDetails.value.email.trim()) || shippingDetails.value.phone.trim().length < 6) {
-      orderError.value = 'Please complete your name, email, phone number, and delivery address.';
+    const requiredFields: Array<[keyof ShippingDetails, string]> = [
+      ['firstName', 'first name'], ['lastName', 'last name'], ['email', 'email address'],
+      ['phone', 'phone number'], ['address', 'delivery address'], ['city', 'city']
+    ];
+    const missingFields = requiredFields.filter(([field]) => !shippingDetails.value[field].trim()).map(([, label]) => label);
+    if (missingFields.length > 0) {
+      orderError.value = `Please complete: ${missingFields.join(', ')}.`;
+      return;
+    }
+    if (!/^\S+@\S+\.\S+$/.test(shippingDetails.value.email.trim()) || shippingDetails.value.phone.trim().length < 6) {
+      orderError.value = 'Enter a valid email address and phone number.';
       return;
     }
 
