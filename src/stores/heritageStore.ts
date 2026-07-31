@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, computed, watch } from 'vue';
+import { ref, computed, nextTick, watch } from 'vue';
 import { Product, Artisan, CartItem, ShippingDetails, DeliveryMethod, Order } from '../types';
 import { supabase } from '../lib/supabase';
 import img7 from '../../assets/img7.jpeg';
@@ -89,6 +89,14 @@ export const useHeritageStore = defineStore('heritageStore', () => {
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
+    if (!error) {
+      shippingDetails.value = {
+        firstName: '', lastName: '', email: '', phone: '', mpesaReference: '',
+        address: '', city: '', postalCode: '', deliveryNotes: ''
+      };
+      await nextTick();
+      sessionStorage.removeItem('sage_shipping_details');
+    }
     authMessage.value = error ? error.message : null;
   };
 
