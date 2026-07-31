@@ -14,6 +14,8 @@ create table if not exists public.customer_profiles (
 );
 
 alter table public.customer_profiles enable row level security;
+grant select, insert, update on public.customer_profiles to authenticated;
+grant select, insert, update on public.customer_profiles to service_role;
 
 drop policy if exists "Users can read their own profile" on public.customer_profiles;
 create policy "Users can read their own profile" on public.customer_profiles
