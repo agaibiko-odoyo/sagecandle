@@ -10,9 +10,9 @@ import img11 from '../../assets/img11.jpeg';
 import img12 from '../../assets/img12.jpeg';
 import img13 from '../../assets/img13.jpeg';
 import img14 from '../../assets/img14.jpeg';
-import bubblegumImage from '../../assets/bubblegum.jpeg';
-import caramelImage from '../../assets/caramel.jpeg';
-import vanillaImage from '../../assets/vanilla.jpeg';
+import vanilla from '../assets/vanilla.jpeg';
+import bubblegum from '../..assets/bubblegum.jpeg';
+import caramel from '../..assets/caramel.jpeg';
 
 export type AppView = 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'checkout' | 'confirmation' | 'tracking' | 'shipment';
 type CollectionFilter = 'all' | Product['category'];
@@ -70,7 +70,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
 
     activeView.value = view;
     collectionFilter.value = filter === 'candles' || filter === 'textiles' || filter === 'pottery' ? filter : 'all';
-    selectedProduct.value = productId ? products.value.find(product => product.id === productId && product.isAvailable) || null : null;
+    selectedProduct.value = productId ? products.value.find(product => product.id === productId) || null : null;
   };
 
   const navigationState = () => window.history.state as { sageCandle?: true; index?: number } | null;
@@ -90,13 +90,10 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const openProduct = (product: Product) => {
-    if (!product.isAvailable) return;
-    navigateTo(activeView.value, {
+  const openProduct = (product: Product) => navigateTo(activeView.value, {
     filter: collectionFilter.value,
     productId: product.id
-    });
-  };
+  });
 
   const closeProduct = () => {
     if (!selectedProduct.value) return;
@@ -152,11 +149,11 @@ export const useHeritageStore = defineStore('heritageStore', () => {
   const products = ref<Product[]>([
     {
       id: 'sunset-nairobi',
-      name: 'Bubblegum',
+      name: 'Ivory Vanilla',
       category: 'candles',
       price: 85.00,
-      image: bubblegumImage,
-      description: 'A playful, sweet-scented artisanal candle with a joyful bubblegum fragrance. Hand-poured with natural soy wax for a warm, nostalgic glow.',
+      image: vanilla,
+      description: 'Scented Artisanal Candle inspired by the warm evening sun setting over the Nairobi. Hand-poured with natural soy wax and local botanicals.',
       collection: 'Scented Memories',
       tag: 'Ancient Rituals',
       details: [
@@ -170,16 +167,15 @@ export const useHeritageStore = defineStore('heritageStore', () => {
         'Notes': 'Ochred Amber, Bergamot, Shea, Sandalwood',
         'Origin': 'Nairobi, Kenya'
       },
-      isNew: true,
-      isAvailable: true
+      isNew: true
     },
     {
       id: 'savannah-dusk',
-      name: 'Caramel',
+      name: 'Sweet Reverie',
       category: 'candles',
       price: 88.00,
-      image: caramelImage,
-      description: 'A rich, comforting caramel candle with a warm, indulgent sweetness. Hand-poured to make every space feel like home.',
+      image: bubblegum,
+      description: 'Rich sandalwood and rare baobab wood fusion that creates a peaceful dusk sanctuary in your home. Hand-poured by women cooperatives.',
       collection: 'Scented Memories',
       tag: 'Ancient Rituals',
       details: [
@@ -192,16 +188,15 @@ export const useHeritageStore = defineStore('heritageStore', () => {
         'Weight': '220g',
         'Notes': 'Baobab wood, Sandalwood, Clove, Orange',
         'Origin': 'Kisumu, Kenya'
-      },
-      isAvailable: true
+      }
     },
     {
       id: 'loomed-horizon',
-      name: 'Vanilla',
+      name: 'Golden Caramel',
       category: 'candles',
       price: 95.00,
-      image: vanillaImage,
-      description: 'A soft, creamy vanilla candle hand-poured to fill your space with a calm and comforting fragrance.',
+      image: caramel,
+      description: 'A luxury scented soy candle that evokes the peaceful breeze over the Mombasa. Hand-poured into a premium ceramic jar inspired by traditional loom patterns.',
       collection: 'Scented Memories',
       tag: 'Woven Memories',
       details: [
@@ -215,12 +210,11 @@ export const useHeritageStore = defineStore('heritageStore', () => {
         'Notes': 'Loomed Cotton, Amber, Wild Sage, Bergamot',
         'Origin': 'Nairobi, Kenya'
       },
-      isNew: true,
-      isAvailable: true
+      isNew: true
     },
     {
       id: 'bogolan-throw',
-      name: 'Bogolan Smoked Oud',
+      name: 'Fresh Mint',
       category: 'candles',
       price: 98.00,
       image: img10,
@@ -237,12 +231,11 @@ export const useHeritageStore = defineStore('heritageStore', () => {
         'Weight': '280g',
         'Notes': 'Smoked Oud, Vetiver, Dry Sage, Sandalwood',
         'Origin': 'Mombasa, Kenya'
-      },
-      isAvailable: false
+      }
     },
     {
       id: 'sculpted-vase',
-      name: 'Artisan Clay Candle Vessel',
+      name: 'Sunset Passion',
       category: 'pottery',
       price: 125.00,
       image: img11,
@@ -260,12 +253,11 @@ export const useHeritageStore = defineStore('heritageStore', () => {
         'Diameter': '12cm',
         'Material': 'Pit-Fired Volcanic Clay',
         'Origin': 'Nairobi, Kenya'
-      },
-      isAvailable: false
+      }
     },
     {
       id: 'royal-triptych',
-      name: 'Cacao & Spiced Honey Candle',
+      name: 'Quiet Woods',
       category: 'textiles',
       price: 75.00,
       image: img12,
@@ -282,8 +274,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
         'Weight': '180g',
         'Notes': 'Dark Cacao, Wild Honey, Grains of Paradise, Cloves',
         'Origin': 'Mombasa, Kenya'
-      },
-      isAvailable: false
+      }
     },
     {
       id: 'beaded-choker',
@@ -305,8 +296,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
         'Snuffer Length': '21cm',
         'Material': '100% Solid Sand-Cast Brass',
         'Origin': 'Kisumu, Kenya'
-      },
-      isAvailable: false
+      }
     },
     {
       id: 'scribe-journal',
@@ -327,8 +317,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
         'Weight': '120g',
         'Notes': 'Desert Amber, Wood Ash, Frankincense, Cardamom',
         'Origin': 'Nairobi, Kenya'
-      },
-      isAvailable: false
+      }
     }
   ]);
 
@@ -347,8 +336,6 @@ export const useHeritageStore = defineStore('heritageStore', () => {
   const cart = ref<CartItem[]>(
     JSON.parse(localStorage.getItem('cart') || '[]')
   );
-
-  cart.value = cart.value.filter(item => products.value.find(product => product.id === item.productId)?.isAvailable);
 
   // Sync cart to localStorage
   watch(cart, (newCart) => {
@@ -381,8 +368,6 @@ export const useHeritageStore = defineStore('heritageStore', () => {
 
   // Actions
   const addToCart = (productId: string, qty: number = 1) => {
-    const product = products.value.find(item => item.id === productId);
-    if (!product?.isAvailable) return;
     const existing = cart.value.find(item => item.productId === productId);
     if (existing) {
       existing.quantity += qty;
@@ -392,7 +377,6 @@ export const useHeritageStore = defineStore('heritageStore', () => {
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
-    if (!products.value.find(item => item.id === productId)?.isAvailable) return;
     const existing = cart.value.find(item => item.productId === productId);
     if (existing) {
       existing.quantity = Math.max(1, quantity);
