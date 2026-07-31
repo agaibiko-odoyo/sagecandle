@@ -10,9 +10,9 @@ import img11 from '../../assets/img11.jpeg';
 import img12 from '../../assets/img12.jpeg';
 import img13 from '../../assets/img13.jpeg';
 import img14 from '../../assets/img14.jpeg';
-import vanilla from '../assets/vanilla.jpeg';
-import bubblegum from '../..assets/bubblegum.jpeg';
-import caramel from '../..assets/caramel.jpeg';
+import vanilla from '../../assets/vanilla.jpeg';
+import bubblegum from '../../assets/bubblegum.jpeg';
+import caramel from '../../assets/caramel.jpeg';
 
 export type AppView = 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'checkout' | 'confirmation' | 'tracking' | 'shipment';
 type CollectionFilter = 'all' | Product['category'];
@@ -70,7 +70,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
 
     activeView.value = view;
     collectionFilter.value = filter === 'candles' || filter === 'textiles' || filter === 'pottery' ? filter : 'all';
-    selectedProduct.value = productId ? products.value.find(product => product.id === productId) || null : null;
+    selectedProduct.value = productId ? products.value.find(product => product.id === productId && product.isAvailable) || null : null;
   };
 
   const navigationState = () => window.history.state as { sageCandle?: true; index?: number } | null;
@@ -90,10 +90,10 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const openProduct = (product: Product) => navigateTo(activeView.value, {
-    filter: collectionFilter.value,
-    productId: product.id
-  });
+  const openProduct = (product: Product) => {
+    if (!product.isAvailable) return;
+    navigateTo(activeView.value, { filter: collectionFilter.value, productId: product.id });
+  };
 
   const closeProduct = () => {
     if (!selectedProduct.value) return;
@@ -167,7 +167,8 @@ export const useHeritageStore = defineStore('heritageStore', () => {
         'Notes': 'Ochred Amber, Bergamot, Shea, Sandalwood',
         'Origin': 'Nairobi, Kenya'
       },
-      isNew: true
+      isNew: true,
+      isAvailable: true
     },
     {
       id: 'savannah-dusk',
@@ -188,7 +189,8 @@ export const useHeritageStore = defineStore('heritageStore', () => {
         'Weight': '220g',
         'Notes': 'Baobab wood, Sandalwood, Clove, Orange',
         'Origin': 'Kisumu, Kenya'
-      }
+      },
+      isAvailable: true
     },
     {
       id: 'loomed-horizon',
@@ -210,7 +212,8 @@ export const useHeritageStore = defineStore('heritageStore', () => {
         'Notes': 'Loomed Cotton, Amber, Wild Sage, Bergamot',
         'Origin': 'Nairobi, Kenya'
       },
-      isNew: true
+      isNew: true,
+      isAvailable: true
     },
     {
       id: 'bogolan-throw',
@@ -231,7 +234,8 @@ export const useHeritageStore = defineStore('heritageStore', () => {
         'Weight': '280g',
         'Notes': 'Smoked Oud, Vetiver, Dry Sage, Sandalwood',
         'Origin': 'Mombasa, Kenya'
-      }
+      },
+      isAvailable: false
     },
     {
       id: 'sculpted-vase',
@@ -253,7 +257,8 @@ export const useHeritageStore = defineStore('heritageStore', () => {
         'Diameter': '12cm',
         'Material': 'Pit-Fired Volcanic Clay',
         'Origin': 'Nairobi, Kenya'
-      }
+      },
+      isAvailable: false
     },
     {
       id: 'royal-triptych',
@@ -274,7 +279,8 @@ export const useHeritageStore = defineStore('heritageStore', () => {
         'Weight': '180g',
         'Notes': 'Dark Cacao, Wild Honey, Grains of Paradise, Cloves',
         'Origin': 'Mombasa, Kenya'
-      }
+      },
+      isAvailable: false
     },
     {
       id: 'beaded-choker',
@@ -296,7 +302,8 @@ export const useHeritageStore = defineStore('heritageStore', () => {
         'Snuffer Length': '21cm',
         'Material': '100% Solid Sand-Cast Brass',
         'Origin': 'Kisumu, Kenya'
-      }
+      },
+      isAvailable: false
     },
     {
       id: 'scribe-journal',
@@ -317,7 +324,8 @@ export const useHeritageStore = defineStore('heritageStore', () => {
         'Weight': '120g',
         'Notes': 'Desert Amber, Wood Ash, Frankincense, Cardamom',
         'Origin': 'Nairobi, Kenya'
-      }
+      },
+      isAvailable: false
     }
   ]);
 
@@ -336,6 +344,8 @@ export const useHeritageStore = defineStore('heritageStore', () => {
   const cart = ref<CartItem[]>(
     JSON.parse(localStorage.getItem('cart') || '[]')
   );
+
+  cart.value = cart.value.filter(item => products.value.find(product => product.id === item.productId)?.isAvailable);
 
   // Sync cart to localStorage
   watch(cart, (newCart) => {
@@ -368,6 +378,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
 
   // Actions
   const addToCart = (productId: string, qty: number = 1) => {
+    if (!products.value.find(product => product.id === productId)?.isAvailable) return;
     const existing = cart.value.find(item => item.productId === productId);
     if (existing) {
       existing.quantity += qty;
@@ -377,6 +388,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
+    if (!products.value.find(product => product.id === productId)?.isAvailable) return;
     const existing = cart.value.find(item => item.productId === productId);
     if (existing) {
       existing.quantity = Math.max(1, quantity);

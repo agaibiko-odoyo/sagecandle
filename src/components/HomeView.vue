@@ -27,7 +27,7 @@ const viewCollection = (filter: 'candles' | 'textiles' | 'pottery') => store.nav
           src="https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&q=80&w=1600" 
           alt="Artisan Background" 
           referrerpolicy="no-referrer"
-          class="w-full h-full object-cover object-center scale-105"
+          class="w-full h-full object-cover object-center"
         />
         <div class="absolute inset-0 bg-neutral-950/80 backdrop-brightness-75"></div>
       </div>
