@@ -16,13 +16,26 @@ export default async function handler(request, response) {
     const { data: userData, error: userError } = await db.auth.getUser(accessToken);
     if (userError || !userData.user) return response.status(401).json({ error: 'Your sign-in session has expired.' });
 
-    const { data, error } = await db
+    const { data: orders, error: ordersError } = await db
       .from('delivery_orders')
-      .select('id, order_number, created_at, status, total, delivery_order_items(id, product_name, quantity, unit_price)')
+      .select('id, order_number, created_at, status, total')
       .eq('user_id', userData.user.id)
       .order('created_at', { ascending: false });
-    if (error) throw error;
-    return response.status(200).json({ orders: data || [] });
+    if (ordersError) throw new Error(ordersError.message);
+
+    const orderIds = (orders || []).map(order => order.id);
+    const { data: items, error: itemsError } = orderIds.length
+      ? await db.from('delivery_order_items').select('id, order_id, product_name, quantity, unit_price').in('order_id', orderIds)
+      : { data: [], error: null };
+    if (itemsError) throw new Error(itemsError.message);
+
+    const itemsByOrder = new Map();
+    for (const item of items || []) {
+      const current = itemsByOrder.get(item.order_id) || [];
+      current.push(item);
+      itemsByOrder.set(item.order_id, current);
+    }
+    return response.status(200).json({ orders: (orders || []).map(order => ({ ...order, delivery_order_items: itemsByOrder.get(order.id) || [] })) });
   } catch (error) {
     return response.status(500).json({ error: error instanceof Error ? error.message : 'Unable to load order history.' });
   }
