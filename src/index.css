@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Work+Sans:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* Use the application's .dark class rather than the operating-system preference. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Work Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-mono: "Work Sans", ui-sans-serif, system-ui, sans-serif;
+  
+  /* Heritage Luxe Light: ochre actions and sand structural tones. */
+  --color-gold-50: #fff8f5;
+  --color-gold-100: #f4e5de;
+  --color-gold-200: #e1bfb3;
+  --color-gold-300: #d4c7b0;
+  --color-gold-400: #ffb597;
+  --color-gold-500: #a13b00;
+  --color-gold-600: #e65d13;
+  --color-gold-700: #7e2c00;
+  --color-gold-800: #5d2200;
+  --color-gold-900: #4a1700;
+  --color-gold-950: #360f00;
+  
+  --color-luxe-dark: #2f312f;
+  --color-luxe-gray: #242624;
+  --color-luxe-light: #faf9f6;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-luxe-light);
+    color: #1a1c1a;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    overflow-x: hidden;
+  }
+  
+  .dark body {
+    background-color: var(--color-luxe-dark);
+    color: #f3f4f6;
+  }
+
+  /* Editorial light surfaces use tonal separation rather than dark shadows. */
+  html:not(.dark) input,
+  html:not(.dark) textarea,
+  html:not(.dark) select {
+    background-color: #f2f0ea;
+    border-color: #d4c7b0;
+  }
+
+  html:not(.dark) input:focus,
+  html:not(.dark) textarea:focus,
+  html:not(.dark) select:focus {
+    border-color: #e65d13;
+  }
+}
+
+@layer utilities {
+  /* Keep elevation warm and quiet in light mode. */
+  html:not(.dark) .shadow-sm,
+  html:not(.dark) .shadow-md,
+  html:not(.dark) .shadow-lg,
+  html:not(.dark) .shadow-xl,
+  html:not(.dark) .shadow-2xl {
+    box-shadow: 0 12px 32px rgba(230, 93, 19, 0.04);
+  }
+}
+
+/* Custom fade animations */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.fade-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+/* Custom premium divider pattern */
+.divider-pattern {
+  height: 4px;
+  background-image: radial-gradient(var(--color-gold-500) 1px, transparent 1px);
+  background-size: 8px 8px;
+}

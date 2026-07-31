@@ -1,0 +1,6 @@
+{
+  "name": "Sage Candle",
+  "description": "An ultra-premium digital boutique celebrating African craftsmanship, featuring luxury collections of hand-poured scented candles, custom reusable vessels, and brass care accessories.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
