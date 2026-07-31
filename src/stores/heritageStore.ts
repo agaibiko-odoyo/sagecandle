@@ -35,6 +35,7 @@ const pathViews: Record<string, AppView> = Object.fromEntries(
 ) as Record<string, AppView>;
 
 export const useHeritageStore = defineStore('heritageStore', () => {
+  const savedShippingDetails = JSON.parse(sessionStorage.getItem('sage_shipping_details') || '{}') as Partial<ShippingDetails>;
   // Theme state (Dark Mode)
   const isDarkMode = ref(localStorage.getItem('theme') === 'dark');
 
@@ -118,20 +119,25 @@ export const useHeritageStore = defineStore('heritageStore', () => {
   // Checkout Multi-step State
   const checkoutStep = ref<number>(1);
   const shippingDetails = ref<ShippingDetails>({
-    firstName: '',
-    lastName: '',
-    email: '',
+    firstName: savedShippingDetails.firstName || '',
+    lastName: savedShippingDetails.lastName || '',
+    email: savedShippingDetails.email || '',
     mpesaReference: '',
-    address: '',
-    city: '',
-    postalCode: '',
-    deliveryNotes: ''
+    address: savedShippingDetails.address || '',
+    city: savedShippingDetails.city || '',
+    postalCode: savedShippingDetails.postalCode || '',
+    deliveryNotes: savedShippingDetails.deliveryNotes || ''
   });
   
   const deliveryMethods = ref<DeliveryMethod[]>([
     { id: 'standard', name: 'Standard Heritage Courier', cost: 15.00, time: '3-5 Business Days' },
     { id: 'express', name: 'Express Boutique Delivery', cost: 45.00, time: 'Next Day Delivery' }
   ]);
+
+  watch(shippingDetails, details => {
+    const { mpesaReference: _mpesaReference, ...detailsToCache } = details;
+    sessionStorage.setItem('sage_shipping_details', JSON.stringify(detailsToCache));
+  }, { deep: true });
   const selectedDeliveryMethodId = ref<string>('standard');
   const selectedDeliveryMethod = computed(() => {
     return deliveryMethods.value.find(m => m.id === selectedDeliveryMethodId.value) || deliveryMethods.value[0];
@@ -510,6 +516,8 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     paymentStatus.value = 'pending';
     paymentMessage.value = result.message || 'Your order is awaiting manual payment confirmation.';
     orderAccessToken.value = result.orderAccessToken;
+    clearCart();
+    shippingDetails.value.mpesaReference = '';
     navigateTo('confirmation');
     checkoutStep.value = 1;
     isSubmittingOrder.value = false;

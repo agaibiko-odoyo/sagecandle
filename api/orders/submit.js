@@ -17,6 +17,14 @@ export default async function handler(request, response) {
     if (!Array.isArray(items) || items.length === 0) throw new Error('Your order is empty.');
 
     const db = supabaseAdmin();
+    const { data: existingReference, error: referenceLookupError } = await db
+      .from('mpesa_payments')
+      .select('id')
+      .eq('mpesa_reference', mpesaReference)
+      .maybeSingle();
+    if (referenceLookupError) throw new Error('Could not verify your M-Pesa reference.');
+    if (existingReference) throw new Error('This M-Pesa reference code already exists. Please enter the appropriate code.');
+
     const { data: createdOrders, error: orderError } = await db.rpc('create_delivery_order', {
       p_customer_name: `${shippingDetails.firstName || ''} ${shippingDetails.lastName || ''}`.trim(),
       p_customer_email: shippingDetails.email || '',
@@ -48,6 +56,7 @@ export default async function handler(request, response) {
       amount: order.total,
       status: 'awaiting_confirmation'
     });
+    if (paymentError?.code === '23505') throw new Error('This M-Pesa reference code already exists. Please enter the appropriate code.');
     if (paymentError) throw new Error('Could not record your M-Pesa reference.');
 
     await db.from('delivery_orders').update({ status: 'awaiting_confirmation' }).eq('id', order.id);

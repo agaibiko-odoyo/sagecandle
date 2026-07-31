@@ -147,7 +147,8 @@ const handlePlaceOrder = async () => {
         <div class="rounded-lg border border-gold-300/70 bg-gold-50/50 p-5 dark:border-gold-800 dark:bg-gold-950/15 space-y-2">
           <p class="text-[10px] font-mono uppercase tracking-widest text-gold-700 dark:text-gold-400">Payment instructions</p>
           <p class="font-serif text-base text-neutral-800 dark:text-neutral-100">Send your payment to M-Pesa number <span class="font-mono font-semibold text-gold-700 dark:text-gold-400">0790019174</span>.</p>
-          <p class="text-xs leading-relaxed text-neutral-600 dark:text-neutral-400">After paying, paste the M-Pesa reference code from your confirmation message into the field below. We will confirm your order manually.</p>
+          <p class="text-xs leading-relaxed text-neutral-600 dark:text-neutral-400">After paying the full order amount, paste the M-Pesa reference code from your confirmation message into the field below. We will confirm your order manually.</p>
+          <p class="text-xs leading-relaxed text-red-700 dark:text-red-300">Payments below the full order amount will be reversed, and products will not be delivered.</p>
         </div>
 
         <div class="space-y-4">
