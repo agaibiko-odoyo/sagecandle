@@ -18,6 +18,14 @@ import blueberry from '../../assets/blueberry.jpeg';
 export type AppView = 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'checkout' | 'confirmation' | 'tracking' | 'shipment';
 type CollectionFilter = 'all' | Product['category'];
 
+const productDisplayOrder = [
+  'sunset-nairobi',
+  'loomed-horizon',
+  'savannah-dusk',
+  'bogolan-throw',
+  'royal-triptych'
+];
+
 const viewPaths: Record<AppView, string> = {
   home: '/',
   curated: '/collections',
@@ -398,6 +406,12 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       isAvailable: false
     }
   ]);
+
+  products.value.sort((a, b) => {
+    const aIndex = productDisplayOrder.indexOf(a.id);
+    const bIndex = productDisplayOrder.indexOf(b.id);
+    return (aIndex === -1 ? Number.MAX_SAFE_INTEGER : aIndex) - (bIndex === -1 ? Number.MAX_SAFE_INTEGER : bIndex);
+  });
 
   if (catalogueLoaded.value) {
     products.value = products.value.map(product => {
