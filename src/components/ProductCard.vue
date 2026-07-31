@@ -43,7 +43,7 @@ const handleAddToCart = (e: Event) => {
       
       <!-- New product indicator tag -->
       <span 
-        v-if="product.isNew"
+        v-if="product.isAvailable"
         class="absolute top-4 left-4 text-[10px] tracking-widest font-mono uppercase bg-gold-500 text-white px-2 py-0.5 rounded-sm shadow-md"
       >
         New Release
