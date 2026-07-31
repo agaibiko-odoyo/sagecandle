@@ -332,13 +332,13 @@ export const useHeritageStore = defineStore('heritageStore', () => {
   ]);
 
   const loadProductPrices = async () => {
-    const { data, error } = await supabase.from('products').select('id, price');
+    const { data, error } = await supabase.from('products').select('id, price, is_active');
     if (error || !data) return;
 
-    const prices = new Map(data.map(product => [product.id, Number(product.price)]));
+    const catalogue = new Map(data.map(product => [product.id, { price: Number(product.price), isAvailable: product.is_active }]));
     products.value = products.value.map(product => {
-      const price = prices.get(product.id);
-      return price === undefined ? product : { ...product, price };
+      const databaseProduct = catalogue.get(product.id);
+      return databaseProduct ? { ...product, ...databaseProduct } : { ...product, isAvailable: false };
     });
   };
 
