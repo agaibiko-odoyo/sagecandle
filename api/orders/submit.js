@@ -14,6 +14,9 @@ export default async function handler(request, response) {
     const { shippingDetails, deliveryMethodId, items } = request.body || {};
     const mpesaReference = String(shippingDetails?.mpesaReference || '').trim().toUpperCase();
     if (!/^[A-Z0-9]{10}$/.test(mpesaReference)) throw new Error('Enter a valid 10-character M-Pesa reference code.');
+    if (!/^\S+@\S+\.\S+$/.test(String(shippingDetails?.email || '').trim()) || String(shippingDetails?.phone || '').trim().length < 6) {
+      throw new Error('Enter a valid email address and phone number.');
+    }
     if (!Array.isArray(items) || items.length === 0) throw new Error('Your order is empty.');
 
     const db = supabaseAdmin();
@@ -28,7 +31,7 @@ export default async function handler(request, response) {
     const { data: createdOrders, error: orderError } = await db.rpc('create_delivery_order', {
       p_customer_name: `${shippingDetails.firstName || ''} ${shippingDetails.lastName || ''}`.trim(),
       p_customer_email: shippingDetails.email || '',
-      p_customer_phone: '',
+      p_customer_phone: String(shippingDetails.phone).trim(),
       p_address: shippingDetails.address || '',
       p_city: shippingDetails.city || '',
       p_postal_code: shippingDetails.postalCode || '',

@@ -122,6 +122,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     firstName: savedShippingDetails.firstName || '',
     lastName: savedShippingDetails.lastName || '',
     email: savedShippingDetails.email || '',
+    phone: savedShippingDetails.phone || '',
     mpesaReference: '',
     address: savedShippingDetails.address || '',
     city: savedShippingDetails.city || '',
@@ -466,8 +467,8 @@ export const useHeritageStore = defineStore('heritageStore', () => {
   const placeOrder = async () => {
     if (cart.value.length === 0) return;
 
-    if (!shippingDetails.value.firstName.trim() || !shippingDetails.value.lastName.trim() || !shippingDetails.value.address.trim() || !shippingDetails.value.city.trim()) {
-      orderError.value = 'Please complete your name and delivery address.';
+    if (!shippingDetails.value.firstName.trim() || !shippingDetails.value.lastName.trim() || !shippingDetails.value.address.trim() || !shippingDetails.value.city.trim() || !/^\S+@\S+\.\S+$/.test(shippingDetails.value.email.trim()) || shippingDetails.value.phone.trim().length < 6) {
+      orderError.value = 'Please complete your name, email, phone number, and delivery address.';
       return;
     }
 

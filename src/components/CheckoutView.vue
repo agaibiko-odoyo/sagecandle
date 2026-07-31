@@ -79,6 +79,14 @@ const handlePlaceOrder = async () => {
               required 
             />
           </div>
+          <div class="space-y-1.5">
+            <label class="shipping-label text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">Email Address</label>
+            <input v-model="store.shippingDetails.email" type="email" class="shipping-input w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" placeholder="you@example.com" required />
+          </div>
+          <div class="space-y-1.5">
+            <label class="shipping-label text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">Phone Number</label>
+            <input v-model="store.shippingDetails.phone" type="tel" class="shipping-input w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" placeholder="e.g. 0712 345 678" required />
+          </div>
           <div class="sm:col-span-2 space-y-1.5">
             <label class="shipping-label text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">Address</label>
             <input 
