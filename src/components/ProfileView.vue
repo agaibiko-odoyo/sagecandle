@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
-import { ClipboardList, LogOut, Mail, User } from 'lucide-vue-next';
+import { ClipboardList, LogOut, MapPin, Pencil, User } from 'lucide-vue-next';
 import { supabase } from '../lib/supabase';
 import { useHeritageStore } from '../stores/heritageStore';
 
@@ -18,8 +18,54 @@ const email = ref(store.authUser?.email || store.shippingDetails.email);
 const orders = ref<OrderRow[]>([]);
 const loadingOrders = ref(false);
 const orderError = ref<string | null>(null);
+const editingProfile = ref(false);
+const savingProfile = ref(false);
+const profileMessage = ref<string | null>(null);
+const profile = ref({ firstName: '', lastName: '', email: '', phone: '', address: '', city: '', postalCode: '', deliveryNotes: '' });
 
 const statusLabel = (status: string) => status.replaceAll('_', ' ');
+
+const getAccessToken = async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.access_token || null;
+};
+
+const loadProfile = async () => {
+  if (!store.authUser) return;
+  const accessToken = await getAccessToken();
+  if (!accessToken) return;
+  const response = await fetch('/api/account/profile', { headers: { Authorization: `Bearer ${accessToken}` } });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || !result.profile) {
+    profile.value.email = store.authUser.email || '';
+    return;
+  }
+  const saved = result.profile;
+  profile.value = {
+    firstName: saved.first_name || '', lastName: saved.last_name || '', email: saved.email || store.authUser.email || '',
+    phone: saved.phone || '', address: saved.address || '', city: saved.city || '', postalCode: saved.postal_code || '', deliveryNotes: saved.delivery_notes || ''
+  };
+  store.shippingDetails = { ...store.shippingDetails, ...profile.value, mpesaReference: '' };
+};
+
+const saveProfile = async () => {
+  const accessToken = await getAccessToken();
+  if (!accessToken) return;
+  savingProfile.value = true;
+  profileMessage.value = null;
+  const response = await fetch('/api/account/profile', {
+    method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` }, body: JSON.stringify(profile.value)
+  });
+  const result = await response.json().catch(() => ({}));
+  savingProfile.value = false;
+  if (!response.ok) {
+    profileMessage.value = result.error || 'Your details could not be saved.';
+    return;
+  }
+  store.shippingDetails = { ...store.shippingDetails, ...profile.value, mpesaReference: '' };
+  editingProfile.value = false;
+  profileMessage.value = 'Your saved delivery details have been updated.';
+};
 
 const loadOrders = async () => {
   if (!store.authUser) {
@@ -41,7 +87,10 @@ const loadOrders = async () => {
   loadingOrders.value = false;
 };
 
-watch(() => store.authUser?.id, () => void loadOrders(), { immediate: true });
+watch(() => store.authUser?.id, () => {
+  void loadOrders();
+  void loadProfile();
+}, { immediate: true });
 watch(() => store.authUser?.email, value => {
   if (value) email.value = value;
 });
@@ -83,6 +132,23 @@ onMounted(() => void loadOrders());
           <div class="min-w-0"><h2 class="font-serif text-lg">Signed in</h2><p class="truncate text-xs text-neutral-500">{{ store.authUser.email }}</p></div>
         </div>
         <button @click="store.signOut" class="inline-flex items-center gap-2 text-xs font-mono uppercase text-neutral-500 hover:text-gold-700"><LogOut class="h-4 w-4" /> Sign out</button>
+      </section>
+
+      <section class="bg-white/40 dark:bg-luxe-gray/40 border border-gold-200/30 dark:border-gold-900/10 p-6 rounded-lg space-y-4 shadow-sm">
+        <div class="flex items-center justify-between gap-4 border-b border-gold-100/40 dark:border-gold-950/20 pb-3"><div class="flex items-center gap-3"><MapPin class="h-5 w-5 text-gold-600" /><h2 class="font-serif text-xl">Saved Delivery Details</h2></div><button v-if="!editingProfile" @click="editingProfile = true" class="inline-flex items-center gap-1 text-xs font-mono uppercase text-gold-700 dark:text-gold-400"><Pencil class="h-3.5 w-3.5" /> Edit</button></div>
+        <form v-if="editingProfile" class="grid grid-cols-1 gap-3 sm:grid-cols-2" @submit.prevent="saveProfile">
+          <input v-model="profile.firstName" required placeholder="First name" class="px-3 py-2.5 border border-gold-200 dark:border-gold-800 rounded bg-transparent text-sm" />
+          <input v-model="profile.lastName" required placeholder="Last name" class="px-3 py-2.5 border border-gold-200 dark:border-gold-800 rounded bg-transparent text-sm" />
+          <input v-model="profile.email" required type="email" placeholder="Email address" class="sm:col-span-2 px-3 py-2.5 border border-gold-200 dark:border-gold-800 rounded bg-transparent text-sm" />
+          <input v-model="profile.phone" required type="tel" placeholder="Phone number" class="sm:col-span-2 px-3 py-2.5 border border-gold-200 dark:border-gold-800 rounded bg-transparent text-sm" />
+          <input v-model="profile.address" required placeholder="Street address" class="sm:col-span-2 px-3 py-2.5 border border-gold-200 dark:border-gold-800 rounded bg-transparent text-sm" />
+          <input v-model="profile.city" required placeholder="City" class="px-3 py-2.5 border border-gold-200 dark:border-gold-800 rounded bg-transparent text-sm" />
+          <input v-model="profile.postalCode" placeholder="Postal code" class="px-3 py-2.5 border border-gold-200 dark:border-gold-800 rounded bg-transparent text-sm" />
+          <textarea v-model="profile.deliveryNotes" placeholder="Delivery notes (optional)" class="sm:col-span-2 px-3 py-2.5 border border-gold-200 dark:border-gold-800 rounded bg-transparent text-sm"></textarea>
+          <div class="sm:col-span-2 flex justify-end gap-3"><button type="button" @click="editingProfile = false" class="px-4 py-2 text-xs font-mono uppercase">Cancel</button><button :disabled="savingProfile" type="submit" class="px-4 py-2 bg-gold-600 text-white rounded text-xs font-mono uppercase disabled:opacity-60">{{ savingProfile ? 'Saving…' : 'Save details' }}</button></div>
+        </form>
+        <div v-else class="text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed"><p v-if="profile.firstName || profile.lastName" class="font-medium">{{ profile.firstName }} {{ profile.lastName }}</p><p v-if="profile.phone">{{ profile.phone }}</p><p v-if="profile.address">{{ profile.address }}, {{ profile.city }} {{ profile.postalCode }}</p><p v-else class="text-neutral-500">No saved delivery details yet. Place a signed-in order or add them here.</p></div>
+        <p v-if="profileMessage" class="text-xs text-gold-700 dark:text-gold-400">{{ profileMessage }}</p>
       </section>
 
       <section class="bg-white/40 dark:bg-luxe-gray/40 border border-gold-200/30 dark:border-gold-900/10 p-6 rounded-lg space-y-4 shadow-sm">

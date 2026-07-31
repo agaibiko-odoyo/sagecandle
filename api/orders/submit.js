@@ -54,6 +54,22 @@ export default async function handler(request, response) {
       .from('delivery_orders').select('id, order_number, total').eq('id', orderId).single();
     if (fetchOrderError || !order) throw new Error('Could not prepare your order.');
 
+    if (userId) {
+      const { error: profileError } = await db.from('customer_profiles').upsert({
+        user_id: userId,
+        first_name: String(shippingDetails.firstName || '').trim() || null,
+        last_name: String(shippingDetails.lastName || '').trim() || null,
+        email: String(shippingDetails.email || '').trim().toLowerCase() || null,
+        phone: String(shippingDetails.phone || '').trim() || null,
+        address: String(shippingDetails.address || '').trim() || null,
+        city: String(shippingDetails.city || '').trim() || null,
+        postal_code: String(shippingDetails.postalCode || '').trim() || null,
+        delivery_notes: String(shippingDetails.deliveryNotes || '').trim() || null,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id' });
+      if (profileError) throw new Error('Could not save your account details.');
+    }
+
     const orderAccessToken = randomBytes(32).toString('base64url');
     const tokenHash = createHash('sha256').update(orderAccessToken).digest('hex');
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
