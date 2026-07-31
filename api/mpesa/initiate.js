@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { createHash, randomBytes } from 'node:crypto';
 
 const darajaBaseUrl = process.env.MPESA_ENV === 'production'
   ? 'https://api.safaricom.co.ke'
@@ -63,6 +64,15 @@ export default async function handler(request, response) {
       .from('delivery_orders').select('id, order_number, total').eq('id', orderId).single();
     if (fetchOrderError || !order) throw new Error('Could not prepare your payment.');
 
+    const orderAccessToken = randomBytes(32).toString('base64url');
+    const tokenHash = createHash('sha256').update(orderAccessToken).digest('hex');
+    const { error: tokenError } = await db.from('order_access_tokens').insert({
+      order_id: order.id,
+      token_hash: tokenHash,
+      expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+    });
+    if (tokenError) throw new Error('Could not prepare your secure order session.');
+
     const { data: payment, error: paymentError } = await db.from('mpesa_payments')
       .insert({ order_id: order.id, phone_number: phone, amount: order.total, status: 'initiated' })
       .select('id').single();
@@ -103,7 +113,7 @@ export default async function handler(request, response) {
       db.from('delivery_orders').update({ status: 'awaiting_payment' }).eq('id', order.id)
     ]);
 
-    return response.status(200).json({ orderId: order.order_number, checkoutRequestId: stk.CheckoutRequestID, message: 'Check your phone to complete the M-Pesa payment.' });
+    return response.status(200).json({ orderId: order.order_number, orderAccessToken, message: 'Check your phone to complete the M-Pesa payment.' });
   } catch (error) {
     return response.status(400).json({ error: error instanceof Error ? error.message : 'Unable to start payment.' });
   }

@@ -13,6 +13,7 @@ import img14 from '../../assets/img14.jpeg';
 import vanilla from '../../assets/vanilla.jpeg';
 import bubblegum from '../../assets/bubblegum.jpeg';
 import caramel from '../../assets/caramel.jpeg';
+import cubeCandles from '../../assets/cubecandles.jpeg';
 
 export type AppView = 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'checkout' | 'confirmation' | 'tracking' | 'shipment';
 type CollectionFilter = 'all' | Product['category'];
@@ -137,13 +138,14 @@ export const useHeritageStore = defineStore('heritageStore', () => {
   });
 
   // Order Confirmation placeholder
-  const activeOrder = ref<Order | null>(JSON.parse(localStorage.getItem('activeOrder') || 'null'));
-  const orderHistory = ref<Order[]>(JSON.parse(localStorage.getItem('orderHistory') || '[]'));
-  const trackedOrder = ref<Order | null>(JSON.parse(localStorage.getItem('trackedOrder') || 'null'));
+  const activeOrder = ref<Order | null>(null);
+  const orderHistory = ref<Order[]>([]);
+  const trackedOrder = ref<Order | null>(null);
 
-  watch(activeOrder, (order) => localStorage.setItem('activeOrder', JSON.stringify(order)), { deep: true });
-  watch(orderHistory, (orders) => localStorage.setItem('orderHistory', JSON.stringify(orders)), { deep: true });
-  watch(trackedOrder, (order) => localStorage.setItem('trackedOrder', JSON.stringify(order)), { deep: true });
+  // Remove delivery details saved by earlier versions of the app.
+  localStorage.removeItem('activeOrder');
+  localStorage.removeItem('orderHistory');
+  localStorage.removeItem('trackedOrder');
 
   // Static Products Database
   const products = ref<Product[]>([
@@ -217,13 +219,13 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     },
     {
       id: 'bogolan-throw',
-      name: 'Fresh Mint',
+      name: 'Mini Cute Cube Candle',
       category: 'candles',
-      price: 98.00,
-      image: img10,
-      description: 'A deeply aromatic candle featuring smoked wood, desert sage, and rich resins. Inspired by the earth-baked protection symbols of West African Bogolan art.',
+      price: 950.00,
+      image: cubeCandles,
+      description: 'A blend of bubblegum and vanilla scents, to bring out the extra joy on bright sunny days.',
       collection: 'Scented Memories',
-      tag: 'Smoked Wood',
+      tag: 'Decadent Scents',
       details: [
         'Burn time: 65 hours',
         'Hand-painted clay reusable jar',
@@ -310,7 +312,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       name: 'Agadez Amber Travel Tin',
       category: 'textiles',
       price: 38.00,
-      image: img14,
+      image: img7,
       description: 'A compact travel-ready scented candle in a hand-hammered brass tin. Scented with warm desert amber, wood ash, and sweet frankincense.',
       collection: 'Aromatic Travel Tins',
       tag: 'Travel Tins',
@@ -413,16 +415,15 @@ export const useHeritageStore = defineStore('heritageStore', () => {
   const isSubmittingOrder = ref(false);
   const orderError = ref<string | null>(null);
   const paymentStatus = ref<'idle' | 'pending' | 'paid' | 'failed'>(
-    (localStorage.getItem('paymentStatus') as 'idle' | 'pending' | 'paid' | 'failed') || 'idle'
+    sessionStorage.getItem('sage_order_token') ? 'pending' : 'idle'
   );
   const paymentMessage = ref('');
-  const pendingCheckoutRequestId = ref<string | null>(localStorage.getItem('pendingCheckoutRequestId'));
+  const orderAccessToken = ref<string | null>(sessionStorage.getItem('sage_order_token'));
   let paymentPollingId: number | null = null;
 
-  watch(paymentStatus, status => localStorage.setItem('paymentStatus', status));
-  watch(pendingCheckoutRequestId, reference => {
-    if (reference) localStorage.setItem('pendingCheckoutRequestId', reference);
-    else localStorage.removeItem('pendingCheckoutRequestId');
+  watch(orderAccessToken, token => {
+    if (token) sessionStorage.setItem('sage_order_token', token);
+    else sessionStorage.removeItem('sage_order_token');
   });
 
   const stopPaymentStatusPolling = () => {
@@ -431,15 +432,15 @@ export const useHeritageStore = defineStore('heritageStore', () => {
   };
 
   const checkPaymentStatus = async () => {
-    if (!pendingCheckoutRequestId.value || paymentStatus.value !== 'pending') return;
-    const response = await fetch(`/api/mpesa/status?checkoutRequestId=${encodeURIComponent(pendingCheckoutRequestId.value)}`);
+    if (!orderAccessToken.value || paymentStatus.value !== 'pending') return;
+    const response = await fetch(`/api/mpesa/status?token=${encodeURIComponent(orderAccessToken.value)}`);
     if (!response.ok) return;
     const result = await response.json();
     if (result.status === 'pending' || result.status === 'initiated') return;
 
     paymentStatus.value = result.status === 'paid' ? 'paid' : 'failed';
     paymentMessage.value = result.result_description || (result.status === 'paid' ? 'Payment received.' : 'Payment was not completed.');
-    pendingCheckoutRequestId.value = null;
+    orderAccessToken.value = null;
     stopPaymentStatusPolling();
 
     if (result.status === 'paid') {
@@ -508,7 +509,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     activeOrder.value = newOrder;
     paymentStatus.value = 'pending';
     paymentMessage.value = result.message || 'Approve the M-Pesa prompt on your phone to complete payment.';
-    pendingCheckoutRequestId.value = result.checkoutRequestId;
+    orderAccessToken.value = result.orderAccessToken;
     navigateTo('confirmation');
     checkoutStep.value = 1;
     isSubmittingOrder.value = false;
