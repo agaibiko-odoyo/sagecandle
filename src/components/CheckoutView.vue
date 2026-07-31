@@ -152,10 +152,10 @@ const handlePlaceOrder = async () => {
               <span class="text-xs font-serif font-semibold">M-Pesa</span>
             </div>
             <div class="space-y-1.5">
-              <label class="shipping-label text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">M-Pesa Number</label>
-              <input v-model="store.shippingDetails.phone" type="tel" class="shipping-input w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" placeholder="e.g. 0712 345 678" required />
+              <label class="shipping-label text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">M-Pesa Reference Code</label>
+              <input v-model="store.shippingDetails.mpesaReference" @input="store.shippingDetails.mpesaReference = store.shippingDetails.mpesaReference.toUpperCase()" type="text" maxlength="10" class="shipping-input w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-mono uppercase focus:outline-none focus:border-gold-500" placeholder="e.g. UGV3L251HQ" required />
             </div>
-            <p class="text-[10px] text-neutral-500 dark:text-neutral-400">We will send a secure M-Pesa prompt to this number after you place the order.</p>
+            <p class="text-[10px] text-neutral-500 dark:text-neutral-400">Submit the reference shown after completing your M-Pesa payment. We will confirm it manually.</p>
           </div>
         </div>
 
@@ -219,7 +219,7 @@ const handlePlaceOrder = async () => {
           :disabled="store.isSubmittingOrder || store.cart.length === 0"
           class="w-full flex items-center justify-center gap-2 py-4 bg-gold-600 hover:bg-gold-500 dark:bg-gold-600 dark:hover:bg-gold-500 text-white font-mono uppercase text-xs tracking-widest rounded-md shadow-md transition-all active:scale-95"
         >
-          {{ store.isSubmittingOrder ? 'Sending M-Pesa prompt…' : `Pay with M-Pesa — KES ${store.cartTotal.toFixed(2)} →` }}
+          {{ store.isSubmittingOrder ? 'Submitting order…' : `Submit Order — KES ${store.cartTotal.toFixed(2)} →` }}
         </button>
 
         <!-- Back link -->

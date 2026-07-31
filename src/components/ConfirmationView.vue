@@ -56,10 +56,10 @@ onBeforeUnmount(() => store.stopPaymentStatusPolling());
     <!-- Main Message -->
     <div class="space-y-4 max-w-xl mx-auto">
       <span class="text-xs font-mono tracking-widest text-gold-600 dark:text-gold-400 uppercase">
-        {{ store.paymentStatus === 'pending' ? 'M-PESA PAYMENT' : store.paymentStatus === 'failed' ? 'PAYMENT NOT COMPLETED' : 'CONFIRMATION' }}
+        {{ store.paymentStatus === 'pending' ? 'AWAITING CONFIRMATION' : store.paymentStatus === 'failed' ? 'PAYMENT NOT COMPLETED' : 'CONFIRMATION' }}
       </span>
       <h1 v-if="store.paymentStatus === 'pending'" class="font-serif text-3xl md:text-5xl tracking-wide font-light">
-        Complete Payment <br /><span class="italic font-normal text-gold-600">on Your Phone</span>
+        Payment Reference <br /><span class="italic font-normal text-gold-600">Awaiting Confirmation</span>
       </h1>
       <h1 v-else class="font-serif text-3xl md:text-5xl tracking-wide font-light">
         Thank You for <br /><span class="italic font-normal text-gold-600">Honoring</span> the Heritage
@@ -72,7 +72,7 @@ onBeforeUnmount(() => store.stopPaymentStatusPolling());
       <div class="divider-pattern w-32 mx-auto py-1"></div>
 
       <p class="text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed font-sans font-light">
-        {{ store.paymentStatus === 'pending' ? store.paymentMessage || 'Approve the M-Pesa prompt on your phone. This page will update automatically once the payment is complete.' : store.paymentStatus === 'failed' ? store.paymentMessage || 'The M-Pesa payment was not completed. Return to your bag and try again.' : 'Your selection from the Ancestral Artisans collection has been registered. We are now carefully preparing your items for their journey from our craft studio to your home.' }}
+        {{ store.paymentStatus === 'pending' ? store.paymentMessage || 'We are confirming your M-Pesa reference. This page will update automatically once the order is confirmed.' : store.paymentStatus === 'failed' ? store.paymentMessage || 'The M-Pesa payment was not completed. Return to your bag and try again.' : 'Your selection from the Ancestral Artisans collection has been registered. We are now carefully preparing your items for their journey from our craft studio to your home.' }}
       </p>
     </div>
 

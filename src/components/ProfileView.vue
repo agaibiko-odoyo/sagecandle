@@ -11,7 +11,7 @@ const tempShipping = ref({
   firstName: store.shippingDetails.firstName,
   lastName: store.shippingDetails.lastName,
   email: store.shippingDetails.email,
-  phone: store.shippingDetails.phone,
+  mpesaReference: store.shippingDetails.mpesaReference,
   address: store.shippingDetails.address,
   city: store.shippingDetails.city,
   postalCode: store.shippingDetails.postalCode,
@@ -104,8 +104,8 @@ const cancelEdit = () => {
               />
             </div>
             <div class="sm:col-span-2 space-y-1">
-              <label class="text-[10px] font-mono uppercase text-neutral-400">Phone Number</label>
-              <input v-model="tempShipping.phone" type="tel" class="w-full px-3 py-2 border border-gold-200 dark:border-gold-800 rounded bg-transparent text-xs" required />
+              <label class="text-[10px] font-mono uppercase text-neutral-400">M-Pesa Reference Code</label>
+              <input v-model="tempShipping.mpesaReference" type="text" maxlength="10" class="w-full px-3 py-2 border border-gold-200 dark:border-gold-800 rounded bg-transparent text-xs uppercase" />
             </div>
             <div class="sm:col-span-2 space-y-1">
               <label class="text-[10px] font-mono uppercase text-neutral-400">Email Address</label>

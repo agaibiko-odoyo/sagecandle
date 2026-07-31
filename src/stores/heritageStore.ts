@@ -121,7 +121,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     firstName: '',
     lastName: '',
     email: '',
-    phone: '',
+    mpesaReference: '',
     address: '',
     city: '',
     postalCode: '',
@@ -436,7 +436,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     const response = await fetch(`/api/mpesa/status?token=${encodeURIComponent(orderAccessToken.value)}`);
     if (!response.ok) return;
     const result = await response.json();
-    if (result.status === 'pending' || result.status === 'initiated') return;
+    if (result.status === 'pending' || result.status === 'initiated' || result.status === 'awaiting_confirmation') return;
 
     paymentStatus.value = result.status === 'paid' ? 'paid' : 'failed';
     paymentMessage.value = result.result_description || (result.status === 'paid' ? 'Payment received.' : 'Payment was not completed.');
@@ -468,13 +468,13 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     isSubmittingOrder.value = true;
     orderError.value = null;
 
-    if (!shippingDetails.value.phone.trim()) {
-      orderError.value = 'Enter the M-Pesa number you want to pay with.';
+    if (!/^[A-Z0-9]{10}$/.test(shippingDetails.value.mpesaReference.trim().toUpperCase())) {
+      orderError.value = 'Enter a valid 10-character M-Pesa reference code.';
       isSubmittingOrder.value = false;
       return;
     }
 
-    const response = await fetch('/api/mpesa/initiate', {
+    const response = await fetch('/api/orders/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -508,7 +508,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
 
     activeOrder.value = newOrder;
     paymentStatus.value = 'pending';
-    paymentMessage.value = result.message || 'Approve the M-Pesa prompt on your phone to complete payment.';
+    paymentMessage.value = result.message || 'Your order is awaiting manual payment confirmation.';
     orderAccessToken.value = result.orderAccessToken;
     navigateTo('confirmation');
     checkoutStep.value = 1;
