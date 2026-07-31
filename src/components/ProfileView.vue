@@ -32,15 +32,20 @@ const getAccessToken = async () => {
 
 const loadProfile = async () => {
   if (!store.authUser) return;
-  const accessToken = await getAccessToken();
-  if (!accessToken) return;
-  const response = await fetch('/api/account/profile', { headers: { Authorization: `Bearer ${accessToken}` } });
-  const result = await response.json().catch(() => ({}));
-  if (!response.ok || !result.profile) {
+  profileMessage.value = null;
+  const { data: saved, error } = await supabase
+    .from('customer_profiles')
+    .select('first_name, last_name, email, phone, address, city, postal_code, delivery_notes')
+    .eq('user_id', store.authUser.id)
+    .maybeSingle();
+  if (error) {
+    profileMessage.value = 'Your saved delivery details could not be loaded.';
+    return;
+  }
+  if (!saved) {
     profile.value.email = store.authUser.email || '';
     return;
   }
-  const saved = result.profile;
   profile.value = {
     firstName: saved.first_name || '', lastName: saved.last_name || '', email: saved.email || store.authUser.email || '',
     phone: saved.phone || '', address: saved.address || '', city: saved.city || '', postalCode: saved.postal_code || '', deliveryNotes: saved.delivery_notes || ''
@@ -49,17 +54,24 @@ const loadProfile = async () => {
 };
 
 const saveProfile = async () => {
-  const accessToken = await getAccessToken();
-  if (!accessToken) return;
+  if (!store.authUser) return;
   savingProfile.value = true;
   profileMessage.value = null;
-  const response = await fetch('/api/account/profile', {
-    method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` }, body: JSON.stringify(profile.value)
-  });
-  const result = await response.json().catch(() => ({}));
+  const { error } = await supabase.from('customer_profiles').upsert({
+    user_id: store.authUser.id,
+    first_name: profile.value.firstName || null,
+    last_name: profile.value.lastName || null,
+    email: profile.value.email || null,
+    phone: profile.value.phone || null,
+    address: profile.value.address || null,
+    city: profile.value.city || null,
+    postal_code: profile.value.postalCode || null,
+    delivery_notes: profile.value.deliveryNotes || null,
+    updated_at: new Date().toISOString()
+  }, { onConflict: 'user_id' });
   savingProfile.value = false;
-  if (!response.ok) {
-    profileMessage.value = result.error || 'Your details could not be saved.';
+  if (error) {
+    profileMessage.value = 'Your details could not be saved.';
     return;
   }
   store.shippingDetails = { ...store.shippingDetails, ...profile.value, mpesaReference: '' };
