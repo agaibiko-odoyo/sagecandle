@@ -20,6 +20,13 @@ export default async function handler(request, response) {
     if (!Array.isArray(items) || items.length === 0) throw new Error('Your order is empty.');
 
     const db = supabaseAdmin();
+    const accessToken = request.headers.authorization?.replace(/^Bearer\s+/i, '');
+    let userId = null;
+    if (accessToken) {
+      const { data: userData, error: userError } = await db.auth.getUser(accessToken);
+      if (userError) throw new Error('Your sign-in session has expired. Please sign in again or continue as a guest.');
+      userId = userData.user?.id || null;
+    }
     const { data: existingReference, error: referenceLookupError } = await db
       .from('mpesa_payments')
       .select('id')
@@ -37,7 +44,8 @@ export default async function handler(request, response) {
       p_postal_code: shippingDetails.postalCode || '',
       p_delivery_notes: shippingDetails.deliveryNotes || '',
       p_delivery_method_id: deliveryMethodId,
-      p_items: items.map(item => ({ product_id: item.productId, quantity: item.quantity }))
+      p_items: items.map(item => ({ product_id: item.productId, quantity: item.quantity })),
+      p_user_id: userId
     });
     if (orderError || !createdOrders?.[0]) throw new Error(orderError?.message || 'Could not submit your order.');
 

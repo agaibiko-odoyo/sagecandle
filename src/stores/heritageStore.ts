@@ -46,6 +46,51 @@ export const useHeritageStore = defineStore('heritageStore', () => {
   })();
   // Theme state (Dark Mode)
   const isDarkMode = ref(localStorage.getItem('theme') === 'dark');
+  const authUser = ref<{ id: string; email?: string; user_metadata?: Record<string, unknown> } | null>(null);
+  const authReady = ref(false);
+  const authMessage = ref<string | null>(null);
+  let authSubscription: { unsubscribe: () => void } | null = null;
+
+  const applyAuthenticatedUser = (user: typeof authUser.value) => {
+    authUser.value = user;
+    if (user?.email && !shippingDetails.value.email) shippingDetails.value.email = user.email;
+  };
+
+  const initAuth = async () => {
+    const { data } = await supabase.auth.getUser();
+    applyAuthenticatedUser(data.user);
+    authReady.value = true;
+    authSubscription?.unsubscribe();
+    authSubscription = supabase.auth.onAuthStateChange((_event, session) => {
+      applyAuthenticatedUser(session?.user ?? null);
+      authReady.value = true;
+    }).data.subscription;
+  };
+
+  const destroyAuth = () => authSubscription?.unsubscribe();
+
+  const signInWithGoogle = async () => {
+    authMessage.value = null;
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/profile` }
+    });
+    if (error) authMessage.value = error.message;
+  };
+
+  const sendMagicLink = async (email: string) => {
+    authMessage.value = null;
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: { emailRedirectTo: `${window.location.origin}/profile` }
+    });
+    authMessage.value = error ? error.message : 'Check your email for a secure sign-in link.';
+  };
+
+  const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    authMessage.value = error ? error.message : null;
+  };
 
   const toggleDarkMode = () => {
     isDarkMode.value = !isDarkMode.value;
@@ -501,9 +546,13 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       return;
     }
 
+    const { data: { session } } = await supabase.auth.getSession();
     const response = await fetch('/api/orders/submit', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {})
+      },
       body: JSON.stringify({
         shippingDetails: shippingDetails.value,
         deliveryMethodId: selectedDeliveryMethodId.value,
@@ -548,6 +597,14 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     isDarkMode,
     toggleDarkMode,
     initTheme,
+    authUser,
+    authReady,
+    authMessage,
+    initAuth,
+    destroyAuth,
+    signInWithGoogle,
+    sendMagicLink,
+    signOut,
     activeView,
     selectedProduct,
     collectionFilter,

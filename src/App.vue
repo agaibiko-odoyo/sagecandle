@@ -23,10 +23,14 @@ const store = useHeritageStore();
 onMounted(() => {
   store.initTheme();
   store.initNavigation();
+  void store.initAuth();
   void store.loadProductPrices();
 });
 
-onBeforeUnmount(() => store.destroyNavigation());
+onBeforeUnmount(() => {
+  store.destroyNavigation();
+  store.destroyAuth();
+});
 
 const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'checkout' | 'confirmation' | 'tracking' | 'shipment') => store.navigateTo(view);
 </script>
