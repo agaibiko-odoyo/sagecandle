@@ -4,7 +4,6 @@ import { useHeritageStore } from '../stores/heritageStore';
 import { X, ShoppingBag, Globe, } from 'lucide-vue-next';
 import cancelIcon from '../../assets/cancel.svg';
 import awardIcon from '../../assets/award.svg';
-import laureal from '../../assets/laurelwreath.webp';
 import cartIcon from '../../assets/cart.svg';
 import plusIcon from '../../assets/plus.svg';
 import minusIcon from '../../assets/minus.svg';
@@ -113,9 +112,8 @@ const handleAddToBag = () => {
               <li 
                 v-for="(detail, i) in product.details" 
                 :key="i"
-                class="flex items-center gap-2.5 text-xs text-neutral-600 dark:text-neutral-400"
+                class="text-xs text-neutral-600 dark:text-neutral-400"
               >
-                <img :src="laureal" class="h-3 w-3 object-contain" />
                 <span>{{ detail }}</span>
               </li>
             </ul>
