@@ -7,6 +7,11 @@ const store = useHeritageStore();
 const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'checkout' | 'confirmation') => store.navigateTo(view);
 
 const handlePlaceOrder = async () => {
+  const fields = ['firstName', 'lastName', 'email', 'phone', 'address', 'city', 'postalCode', 'mpesaReference'] as const;
+  for (const field of fields) {
+    const input = document.querySelector<HTMLInputElement>(`input[name="${field}"]`);
+    if (input?.value) store.shippingDetails[field] = field === 'mpesaReference' ? input.value.toUpperCase() : input.value;
+  }
   await store.placeOrder();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
@@ -63,6 +68,7 @@ const handlePlaceOrder = async () => {
             <label class="shipping-label text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">First Name</label>
             <input 
               v-model="store.shippingDetails.firstName" 
+              name="firstName"
               type="text" 
               class="shipping-input w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" 
               placeholder="First Name"
@@ -73,6 +79,7 @@ const handlePlaceOrder = async () => {
             <label class="shipping-label text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">Last Name</label>
             <input 
               v-model="store.shippingDetails.lastName" 
+              name="lastName"
               type="text" 
               class="shipping-input w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" 
               placeholder="Last Name"
@@ -81,16 +88,17 @@ const handlePlaceOrder = async () => {
           </div>
           <div class="space-y-1.5">
             <label class="shipping-label text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">Email Address</label>
-            <input v-model="store.shippingDetails.email" type="email" class="shipping-input w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" placeholder="you@example.com" required />
+            <input v-model="store.shippingDetails.email" name="email" type="email" class="shipping-input w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" placeholder="you@example.com" required />
           </div>
           <div class="space-y-1.5">
             <label class="shipping-label text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">Phone Number</label>
-            <input v-model="store.shippingDetails.phone" type="tel" class="shipping-input w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" placeholder="e.g. 0712 345 678" required />
+            <input v-model="store.shippingDetails.phone" name="phone" type="tel" class="shipping-input w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" placeholder="e.g. 0712 345 678" required />
           </div>
           <div class="sm:col-span-2 space-y-1.5">
             <label class="shipping-label text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">Address</label>
             <input 
               v-model="store.shippingDetails.address" 
+              name="address"
               type="text" 
               class="shipping-input w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" 
               placeholder="Address"
@@ -101,6 +109,7 @@ const handlePlaceOrder = async () => {
             <label class="shipping-label text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">City</label>
             <input 
               v-model="store.shippingDetails.city" 
+              name="city"
               type="text" 
               class="shipping-input w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" 
               placeholder="City"
@@ -111,6 +120,7 @@ const handlePlaceOrder = async () => {
             <label class="shipping-label text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">Postal Code</label>
             <input 
               v-model="store.shippingDetails.postalCode" 
+              name="postalCode"
               type="text" 
               class="shipping-input w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" 
               placeholder="Postal Code"
@@ -168,7 +178,7 @@ const handlePlaceOrder = async () => {
             </div>
             <div class="space-y-1.5">
               <label class="shipping-label text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">M-Pesa Reference Code</label>
-              <input v-model="store.shippingDetails.mpesaReference" @input="store.shippingDetails.mpesaReference = store.shippingDetails.mpesaReference.toUpperCase()" type="text" maxlength="10" class="shipping-input w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-mono uppercase focus:outline-none focus:border-gold-500" placeholder="e.g. UGV3L251HQ" required />
+              <input v-model="store.shippingDetails.mpesaReference" name="mpesaReference" @input="store.shippingDetails.mpesaReference = store.shippingDetails.mpesaReference.toUpperCase()" type="text" maxlength="10" class="shipping-input w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-mono uppercase focus:outline-none focus:border-gold-500" placeholder="e.g. UGV3L251HQ" required />
             </div>
             <p class="text-[10px] text-neutral-500 dark:text-neutral-400">Submit the reference shown after completing your M-Pesa payment. We will confirm it manually.</p>
           </div>
