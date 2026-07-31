@@ -318,6 +318,17 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     }
   ]);
 
+  const loadProductPrices = async () => {
+    const { data, error } = await supabase.from('products').select('id, price');
+    if (error || !data) return;
+
+    const prices = new Map(data.map(product => [product.id, Number(product.price)]));
+    products.value = products.value.map(product => {
+      const price = prices.get(product.id);
+      return price === undefined ? product : { ...product, price };
+    });
+  };
+
   // Cart State loaded from localStorage
   const cart = ref<CartItem[]>(
     JSON.parse(localStorage.getItem('cart') || '[]')
@@ -406,14 +417,10 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       p_city: shippingDetails.value.city,
       p_postal_code: shippingDetails.value.postalCode,
       p_delivery_notes: shippingDetails.value.deliveryNotes,
-      p_delivery_method: selectedDeliveryMethod.value.name,
-      p_subtotal: cartSubtotal.value,
-      p_shipping_cost: selectedDeliveryMethod.value.cost,
+      p_delivery_method_id: selectedDeliveryMethodId.value,
       p_items: cartDetailedItems.value.map(({ product, quantity }) => ({
         product_id: product.id,
-        product_name: product.name,
-        quantity,
-        unit_price: product.price
+        quantity
       }))
     });
 
@@ -472,6 +479,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     orderHistory,
     trackedOrder,
     products,
+    loadProductPrices,
     cart,
     cartDetailedItems,
     cartTotalItems,

@@ -23,6 +23,7 @@ const store = useHeritageStore();
 onMounted(() => {
   store.initTheme();
   store.initNavigation();
+  void store.loadProductPrices();
 });
 
 onBeforeUnmount(() => store.destroyNavigation());
