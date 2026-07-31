@@ -100,7 +100,7 @@ const handleAddToBag = () => {
 
           <!-- Description -->
           <div class="space-y-3">
-            <h3 class="font-serif text-lg border-b border-gold-100 dark:border-gold-950 pb-2">The Story</h3>
+            <h3 class="font-serif text-lg border-b border-gold-100 dark:border-gold-950 pb-2">The Feeling</h3>
             <p class="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed font-sans">
               {{ product.description }}
             </p>
@@ -108,7 +108,7 @@ const handleAddToBag = () => {
 
           <!-- Artisanal values / details list -->
           <div class="space-y-3">
-            <h3 class="font-serif text-lg border-b border-gold-100 dark:border-gold-950 pb-2">Authenticity & Process</h3>
+            <h3 class="font-serif text-lg border-b border-gold-100 dark:border-gold-950 pb-2">Perfect For:</h3>
             <ul class="space-y-2.5">
               <li 
                 v-for="(detail, i) in product.details" 

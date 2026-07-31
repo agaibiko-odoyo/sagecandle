@@ -162,14 +162,13 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       category: 'candles',
       price: 85.00,
       image: vanilla,
-      description: 'Scented Artisanal Candle inspired by the warm evening sun setting over the Nairobi. Hand-poured with natural soy wax and local botanicals.',
+      description: 'Meet Ivory Vanilla — soft, warm & irresistibly addictive. A creamy vanilla scent wrapped in pure comfort. Think cozy nights, clean sheets, warm hugs, and that “what smells so good?” moment. ✨ Light it. Let the room glow. Let the scent linger. 🕯️🤍',
       collection: 'Scented Memories',
       tag: 'Ancient Rituals',
       details: [
-        'Burn time: 60 hours',
-        '100% natural soy wax',
-        'Hand-crafted terracotta vessel',
-        'Lead-free natural cotton wick'
+        '✨ Self-care',
+        '🎁 Gifting',
+        '🤍 Making everyday moments feel special'
       ],
       specifications: {
         'Weight': '250g',
@@ -185,14 +184,14 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       category: 'candles',
       price: 88.00,
       image: bubblegum,
-      description: 'Rich sandalwood and rare baobab wood fusion that creates a peaceful dusk sanctuary in your home. Hand-poured by women cooperatives.',
+      description: '🍬🎀 Your childhood favorite just got a luxury upgrade. Meet Sweet Reverie Bubblegum — sweet, playful, and irresistibly nostalgic. 🫧💗 One light and your space transforms into a candy-sweet dream. Think bubblegum, carefree moments, soft-girl energy, and the kind of scent that makes everyone ask: “Wait… what smells THAT good?” 👀✨',
       collection: 'Scented Memories',
       tag: 'Ancient Rituals',
       details: [
-        'Burn time: 55 hours',
-        'Infused with rare essential oils',
-        'Matte black blown-glass vessel',
-        'Wooden crackling wick'
+        '🎀 Girls’ nights & sleepovers',
+        '💗 Romanticizing your space',
+        '🫧 Self-care Sundays',
+        '🎁 Gifting your favorite sweet girl'
       ],
       specifications: {
         'Weight': '220g',
@@ -207,14 +206,13 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       category: 'candles',
       price: 95.00,
       image: caramel,
-      description: 'A luxury scented soy candle that evokes the peaceful breeze over the Mombasa. Hand-poured into a premium ceramic jar inspired by traditional loom patterns.',
+      description: '🍯✨ WARNING: Golden Caramel is dangerously addictive. Sweet, buttery caramel with a rich, cozy warmth that makes your space smell like pure indulgence. 🤎 Imagine warm desserts, golden evenings, soft blankets, and that luxurious feeling of having everything just right. 🕯️✨',
       collection: 'Scented Memories',
       tag: 'Woven Memories',
       details: [
-        'Burn time: 70 hours',
-        '100% natural soy & coconut wax',
-        'Woven cotton double wick for even burn',
-        'Premium container inspired by hand-loomed fibers'
+        '🤎 Treating yourself',
+        '🎁 Gifting someone their new favorite scent',
+        '✨ Making your space unforgettable'
       ],
       specifications: {
         'Weight': '300g',
@@ -230,14 +228,13 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       category: 'candles',
       price: 950.00,
       image: cubeCandles,
-      description: 'A blend of bubblegum and vanilla scents, to bring out the extra joy on bright sunny days.',
+      description: 'Small candle. BIG personality. ✨ Meet our Mini Cute Cube Candle — tiny, adorable, and made to add the perfect little touch of luxury to any space. 🤍 Whether you’re styling your bedside table, gifting your bestie, decorating your vanity, or simply treating yourself… this little cutie belongs in your collection.',
       collection: 'Scented Memories',
       tag: 'Decadent Scents',
       details: [
-        'Burn time: 65 hours',
-        'Hand-painted clay reusable jar',
-        'All-natural plant-based wax formulation',
-        'Whispering wood crackle wick'
+        '✨ Cute displays',
+        '🕯️ Cozy moments',
+        '🎁 Gifting loved ones'
       ],
       specifications: {
         'Weight': '280g',
