@@ -54,6 +54,24 @@
   html:not(.dark) select:focus {
     border-color: #e65d13;
   }
+
+  .shipping-label {
+    color: #73716c;
+  }
+
+  html:not(.dark) .shipping-input:not(:placeholder-shown) {
+    background-color: #e7e4dd;
+    border-color: #c9bfad;
+    color: #343330;
+  }
+
+  .dark .shipping-label {
+    color: #b6b2aa;
+  }
+
+  .dark .shipping-input:not(:placeholder-shown) {
+    background-color: rgba(36, 38, 36, 0.72);
+  }
 }
 
 @layer utilities {

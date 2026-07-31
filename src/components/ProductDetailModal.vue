@@ -31,7 +31,7 @@ const decrement = () => {
 };
 
 const handleAddToBag = () => {
-  if (!product.price) return;
+  if (!product.value?.isAvailable) return;
   store.addToCart(product.value.id, quantity.value);
   handleClose();
 };

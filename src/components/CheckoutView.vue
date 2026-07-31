@@ -60,51 +60,51 @@ const handlePlaceOrder = async () => {
         <!-- Form fields (prefilled Kwame Mensah) -->
         <form @submit.prevent class="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div class="space-y-1.5">
-            <label class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">First Name</label>
+            <label class="shipping-label text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">First Name</label>
             <input 
               v-model="store.shippingDetails.firstName" 
               type="text" 
-              class="w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" 
+              class="shipping-input w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" 
               placeholder="First Name"
               required 
             />
           </div>
           <div class="space-y-1.5">
-            <label class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">Last Name</label>
+            <label class="shipping-label text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">Last Name</label>
             <input 
               v-model="store.shippingDetails.lastName" 
               type="text" 
-              class="w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" 
+              class="shipping-input w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" 
               placeholder="Last Name"
               required 
             />
           </div>
           <div class="sm:col-span-2 space-y-1.5">
-            <label class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">Address</label>
+            <label class="shipping-label text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">Address</label>
             <input 
               v-model="store.shippingDetails.address" 
               type="text" 
-              class="w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" 
+              class="shipping-input w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" 
               placeholder="Address"
               required 
             />
           </div>
           <div class="space-y-1.5">
-            <label class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">City</label>
+            <label class="shipping-label text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">City</label>
             <input 
               v-model="store.shippingDetails.city" 
               type="text" 
-              class="w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" 
+              class="shipping-input w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" 
               placeholder="City"
               required 
             />
           </div>
           <div class="space-y-1.5">
-            <label class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">Postal Code</label>
+            <label class="shipping-label text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">Postal Code</label>
             <input 
               v-model="store.shippingDetails.postalCode" 
               type="text" 
-              class="w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" 
+              class="shipping-input w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" 
               placeholder="Postal Code"
               required 
             />
@@ -152,8 +152,8 @@ const handlePlaceOrder = async () => {
               <span class="text-xs font-serif font-semibold">M-Pesa</span>
             </div>
             <div class="space-y-1.5">
-              <label class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">M-Pesa Number</label>
-              <input v-model="store.shippingDetails.phone" type="tel" class="w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" placeholder="e.g. 0712 345 678" required />
+              <label class="shipping-label text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">M-Pesa Number</label>
+              <input v-model="store.shippingDetails.phone" type="tel" class="shipping-input w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" placeholder="e.g. 0712 345 678" required />
             </div>
             <p class="text-[10px] text-neutral-500 dark:text-neutral-400">We will send a secure M-Pesa prompt to this number after you place the order.</p>
           </div>
