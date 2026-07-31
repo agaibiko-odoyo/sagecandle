@@ -27,7 +27,7 @@ export default async function handler(request, response) {
       .select('order_id').single();
     if (error || !payment) throw new Error('Payment record was not found.');
 
-    await db.from('delivery_orders').update({ status: paid ? 'confirmed' : 'payment_failed' }).eq('id', payment.order_id);
+    await db.from('delivery_orders').update({ status: paid ? 'order_confirmed' : 'awaiting_confirmation' }).eq('id', payment.order_id);
     return response.status(200).json({ ResultCode: 0, ResultDesc: 'Accepted' });
   } catch (error) {
     console.error('M-Pesa callback error', error);

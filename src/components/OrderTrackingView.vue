@@ -6,11 +6,11 @@ import { useHeritageStore } from '../stores/heritageStore';
 const store = useHeritageStore();
 const order = computed(() => store.trackedOrder || store.activeOrder || store.orderHistory[0] || null);
 const steps = [
-  { label: 'Order Placed', icon: Check, complete: true },
-  { label: 'Artisan Prep', icon: Palette, complete: true },
-  { label: 'Shipped', icon: Truck, complete: false },
+  { label: 'Awaiting Confirmation', icon: Check, complete: true },
+  { label: 'Order Confirmed', icon: Palette, complete: true },
+  { label: 'Departed Store', icon: Truck, complete: false },
   { label: 'Out for Delivery', icon: PackageCheck, complete: false },
-  { label: 'Delivered', icon: Verified, complete: false }
+  { label: 'Delivered Successfully', icon: Verified, complete: false }
 ];
 const arrival = computed(() => {
   const format: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };

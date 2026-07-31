@@ -22,7 +22,8 @@ export default async function handler(request, response) {
       .single();
     if (error || !data) return response.status(404).json({ error: 'Payment not found.' });
     const { data: order } = await db.from('delivery_orders').select('status').eq('id', token.order_id).single();
-    const status = order?.status === 'confirmed' ? 'paid' : order?.status === 'payment_failed' || data.status === 'failed' ? 'failed' : data.status;
+    const completedStatuses = ['order_confirmed', 'departed_store', 'out_for_delivery', 'delivered_successfully'];
+    const status = completedStatuses.includes(order?.status) ? 'paid' : data.status === 'failed' ? 'failed' : data.status;
     return response.status(200).json({ ...data, status });
   } catch {
     return response.status(500).json({ error: 'Unable to check payment status.' });

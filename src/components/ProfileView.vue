@@ -28,12 +28,16 @@ const loadOrders = async () => {
   }
   loadingOrders.value = true;
   orderError.value = null;
-  const { data, error } = await supabase
-    .from('delivery_orders')
-    .select('id, order_number, created_at, status, total, delivery_order_items(id, product_name, quantity, unit_price)')
-    .order('created_at', { ascending: false });
-  if (error) orderError.value = 'Your order history could not be loaded. Please try again.';
-  else orders.value = (data || []) as OrderRow[];
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) {
+    orderError.value = 'Your sign-in session has expired. Please sign in again.';
+    loadingOrders.value = false;
+    return;
+  }
+  const response = await fetch('/api/orders/history', { headers: { Authorization: `Bearer ${session.access_token}` } });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) orderError.value = result.error || 'Your order history could not be loaded. Please try again.';
+  else orders.value = (result.orders || []) as OrderRow[];
   loadingOrders.value = false;
 };
 
