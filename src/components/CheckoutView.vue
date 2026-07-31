@@ -200,7 +200,7 @@ const handlePlaceOrder = async () => {
               <span class="text-[9px] font-mono text-neutral-400 block">{{ item.product.tag }} (x{{ item.quantity }})</span>
             </div>
             <span class="font-mono text-xs font-semibold shrink-0">
-              KES {{ (item.product.price * item.quantity).toFixed(2) }}
+              {{ store.catalogueLoaded ? `KES ${(item.product.price * item.quantity).toFixed(2)}` : 'Loading price…' }}
             </span>
           </div>
         </div>
@@ -209,7 +209,7 @@ const handlePlaceOrder = async () => {
         <div class="space-y-3.5 text-xs font-sans">
           <div class="flex justify-between">
             <span class="text-neutral-500 dark:text-neutral-400">Subtotal</span>
-            <span class="font-mono">KES {{ store.cartSubtotal.toFixed(2) }}</span>
+            <span class="font-mono">{{ store.catalogueLoaded ? `KES ${store.cartSubtotal.toFixed(2)}` : 'Loading price…' }}</span>
           </div>
           <div class="flex justify-between">
             <span class="text-neutral-500 dark:text-neutral-400 font-semibold uppercase">Shipping ({{ store.selectedDeliveryMethod.name }})</span>
@@ -224,17 +224,17 @@ const handlePlaceOrder = async () => {
 
           <div class="flex justify-between text-base font-serif font-bold text-neutral-900 dark:text-white">
             <span>Total</span>
-            <span class="font-mono text-lg">KES {{ store.cartTotal.toFixed(2) }}</span>
+            <span class="font-mono text-lg">{{ store.catalogueLoaded ? `KES ${store.cartTotal.toFixed(2)}` : 'Loading price…' }}</span>
           </div>
         </div>
 
         <p v-if="store.orderError" class="text-xs text-red-600" role="alert">{{ store.orderError }}</p>
         <button 
           @click="handlePlaceOrder"
-          :disabled="store.isSubmittingOrder || store.cart.length === 0"
+          :disabled="!store.catalogueLoaded || store.isSubmittingOrder || store.cart.length === 0"
           class="w-full flex items-center justify-center gap-2 py-4 bg-gold-600 hover:bg-gold-500 dark:bg-gold-600 dark:hover:bg-gold-500 text-white font-mono uppercase text-xs tracking-widest rounded-md shadow-md transition-all active:scale-95"
         >
-          {{ store.isSubmittingOrder ? 'Submitting order…' : `Submit Order — KES ${store.cartTotal.toFixed(2)} →` }}
+          {{ store.isSubmittingOrder ? 'Submitting order…' : store.catalogueLoaded ? `Submit Order — KES ${store.cartTotal.toFixed(2)} →` : 'Loading secure prices…' }}
         </button>
 
         <!-- Back link -->

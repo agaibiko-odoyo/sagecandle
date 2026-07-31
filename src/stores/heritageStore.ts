@@ -36,6 +36,14 @@ const pathViews: Record<string, AppView> = Object.fromEntries(
 
 export const useHeritageStore = defineStore('heritageStore', () => {
   const savedShippingDetails = JSON.parse(sessionStorage.getItem('sage_shipping_details') || '{}') as Partial<ShippingDetails>;
+  const cachedCatalogue = (() => {
+    try {
+      const value = JSON.parse(localStorage.getItem('sage_product_catalogue') || '{}') as Record<string, { price: number; isAvailable: boolean }>;
+      return Object.values(value).every(item => Number.isFinite(item.price) && typeof item.isAvailable === 'boolean') ? value : {};
+    } catch {
+      return {};
+    }
+  })();
   // Theme state (Dark Mode)
   const isDarkMode = ref(localStorage.getItem('theme') === 'dark');
 
@@ -154,13 +162,15 @@ export const useHeritageStore = defineStore('heritageStore', () => {
   localStorage.removeItem('orderHistory');
   localStorage.removeItem('trackedOrder');
 
-  // Static Products Database
+  // Product presentation is local; prices and availability always come from Supabase
+  // or its locally cached response while a fresh response is loading.
+  const catalogueLoaded = ref(Object.keys(cachedCatalogue).length > 0);
   const products = ref<Product[]>([
     {
       id: 'sunset-nairobi',
       name: 'Ivory Vanilla',
       category: 'candles',
-      price: 85.00,
+      price: 0,
       image: vanilla,
       description: 'Meet Ivory Vanilla — soft, warm & irresistibly addictive. A creamy vanilla scent wrapped in pure comfort. Think cozy nights, clean sheets, warm hugs, and that “what smells so good?” moment. Light it. Let the room glow. Let the scent linger.',
       cardDescription: 'Inspired by soft luxury, warm embraces, and the sweet comfort of vanilla.',
@@ -183,7 +193,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       id: 'savannah-dusk',
       name: 'Sweet Reverie',
       category: 'candles',
-      price: 88.00,
+      price: 0,
       image: bubblegum,
       description: 'Your childhood favorite just got a luxury upgrade. Meet Sweet Reverie Bubblegum — sweet, playful, and irresistibly nostalgic. One light and your space transforms into a candy-sweet dream. Think bubblegum, carefree moments, soft-girl energy, and the kind of scent that makes everyone ask: “Wait… what smells THAT good?”',
       cardDescription: 'Inspired by playful sweetness, carefree moments, and the nostalgic joy of bubblegum.',
@@ -206,7 +216,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       id: 'loomed-horizon',
       name: 'Golden Caramel',
       category: 'candles',
-      price: 95.00,
+      price: 0,
       image: caramel,
       description: 'WARNING: Golden Caramel is dangerously addictive. Sweet, buttery caramel with a rich, cozy warmth that makes your space smell like pure indulgence. Imagine warm desserts, golden evenings, soft blankets, and that luxurious feeling of having everything just right.',
       cardDescription: 'Inspired by golden moments, warm sweetness, and irresistible caramel indulgence.',
@@ -229,7 +239,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       id: 'bogolan-throw',
       name: 'Mini Cute Cube Candle',
       category: 'candles',
-      price: 950.00,
+      price: 0,
       image: cubeCandles,
       description: 'Small candle. BIG personality. Meet our Mini Cute Cube Candle — tiny, adorable, and made to add the perfect little touch of luxury to any space. Whether you’re styling your bedside table, gifting your bestie, decorating your vanity, or simply treating yourself… this little cutie belongs in your collection.',
       collection: 'Scented Memories',
@@ -250,7 +260,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       id: 'sculpted-vase',
       name: 'Sunset Passion',
       category: 'pottery',
-      price: 125.00,
+      price: 0,
       image: img11,
       description: 'A stunning hand-turned clay vessel designed to hold our Signature candles. Coated with organic resin and pit-fired to create beautiful, smoky textures.',
       collection: 'Vessel Pottery',
@@ -273,7 +283,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       id: 'royal-triptych',
       name: 'Quiet Woods',
       category: 'textiles',
-      price: 75.00,
+      price: 0,
       image: img12,
       description: 'A decadent candle featuring single-origin dark cacao, wild honey, and warm indigenous spices. Hand-poured into a gorgeous amber glass jar.',
       collection: 'Aromatic Travel Tins',
@@ -295,7 +305,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       id: 'beaded-choker',
       name: 'Solid Brass Candle Care Kit',
       category: 'pottery',
-      price: 75.00,
+      price: 0,
       image: img13,
       description: 'A handcrafted solid brass wick trimmer and snuffer set to care for your luxury candle flames. Enhances burn quality and keeps vessels clean.',
       collection: 'Vessel Pottery',
@@ -318,7 +328,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       id: 'scribe-journal',
       name: 'Agadez Amber Travel Tin',
       category: 'textiles',
-      price: 38.00,
+      price: 0,
       image: img7,
       description: 'A compact travel-ready scented candle in a hand-hammered brass tin. Scented with warm desert amber, wood ash, and sweet frankincense.',
       collection: 'Aromatic Travel Tins',
@@ -338,6 +348,13 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     }
   ]);
 
+  if (catalogueLoaded.value) {
+    products.value = products.value.map(product => {
+      const cachedProduct = cachedCatalogue[product.id];
+      return cachedProduct ? { ...product, ...cachedProduct } : { ...product, isAvailable: false };
+    });
+  }
+
   const loadProductPrices = async () => {
     const { data, error } = await supabase.from('products').select('id, price, is_active');
     if (error || !data) return;
@@ -347,14 +364,17 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       const databaseProduct = catalogue.get(product.id);
       return databaseProduct ? { ...product, ...databaseProduct } : { ...product, isAvailable: false };
     });
+    localStorage.setItem('sage_product_catalogue', JSON.stringify(Object.fromEntries(
+      data.map(product => [product.id, { price: Number(product.price), isAvailable: product.is_active }])
+    )));
+    cart.value = cart.value.filter(item => products.value.find(product => product.id === item.productId)?.isAvailable);
+    catalogueLoaded.value = true;
   };
 
   // Cart State loaded from localStorage
   const cart = ref<CartItem[]>(
     JSON.parse(localStorage.getItem('cart') || '[]')
   );
-
-  cart.value = cart.value.filter(item => products.value.find(product => product.id === item.productId)?.isAvailable);
 
   // Sync cart to localStorage
   watch(cart, (newCart) => {
@@ -387,7 +407,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
 
   // Actions
   const addToCart = (productId: string, qty: number = 1) => {
-    if (!products.value.find(product => product.id === productId)?.isAvailable) return;
+    if (!catalogueLoaded.value || !products.value.find(product => product.id === productId)?.isAvailable) return;
     const existing = cart.value.find(item => item.productId === productId);
     if (existing) {
       existing.quantity += qty;
@@ -397,7 +417,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
-    if (!products.value.find(product => product.id === productId)?.isAvailable) return;
+    if (!catalogueLoaded.value || !products.value.find(product => product.id === productId)?.isAvailable) return;
     const existing = cart.value.find(item => item.productId === productId);
     if (existing) {
       existing.quantity = Math.max(1, quantity);
@@ -465,7 +485,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
   };
 
   const placeOrder = async () => {
-    if (cart.value.length === 0) return;
+    if (!catalogueLoaded.value || cart.value.length === 0) return;
 
     if (!shippingDetails.value.firstName.trim() || !shippingDetails.value.lastName.trim() || !shippingDetails.value.address.trim() || !shippingDetails.value.city.trim() || !/^\S+@\S+\.\S+$/.test(shippingDetails.value.email.trim()) || shippingDetails.value.phone.trim().length < 6) {
       orderError.value = 'Please complete your name, email, phone number, and delivery address.';
@@ -551,6 +571,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     orderHistory,
     trackedOrder,
     products,
+    catalogueLoaded,
     loadProductPrices,
     cart,
     cartDetailedItems,

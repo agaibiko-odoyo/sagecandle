@@ -105,7 +105,7 @@ const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'c
                   </p>
                 </div>
                 <span class="font-mono text-base font-semibold">
-                  KES {{ (item.product.price * item.quantity).toFixed(2) }}
+                  {{ store.catalogueLoaded ? `KES ${(item.product.price * item.quantity).toFixed(2)}` : 'Loading price…' }}
                 </span>
               </div>
             </div>
@@ -151,7 +151,7 @@ const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'c
         <div class="space-y-3.5 text-xs font-sans">
           <div class="flex justify-between">
             <span class="text-neutral-500 dark:text-neutral-400">Subtotal</span>
-            <span class="font-mono">KES {{ store.cartSubtotal.toFixed(2) }}</span>
+            <span class="font-mono">{{ store.catalogueLoaded ? `KES ${store.cartSubtotal.toFixed(2)}` : 'Loading price…' }}</span>
           </div>
           <div class="flex justify-between">
             <span class="text-neutral-500 dark:text-neutral-400">Shipping</span>
@@ -166,13 +166,14 @@ const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'c
 
           <div class="flex justify-between text-sm font-serif font-bold">
             <span>Total</span>
-            <span class="font-mono">KES {{ store.cartSubtotal.toFixed(2) }}</span>
+            <span class="font-mono">{{ store.catalogueLoaded ? `KES ${store.cartSubtotal.toFixed(2)}` : 'Loading price…' }}</span>
           </div>
         </div>
 
         <button 
           @click="setView('checkout')"
-          class="w-full flex items-center justify-center gap-2 py-4 bg-gold-600 hover:bg-gold-500 dark:bg-gold-600 dark:hover:bg-gold-500 text-white font-mono uppercase text-xs tracking-widest rounded-md shadow-md transition-all active:scale-95"
+          :disabled="!store.catalogueLoaded"
+          class="w-full flex items-center justify-center gap-2 py-4 bg-gold-600 hover:bg-gold-500 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-gold-600 dark:hover:bg-gold-500 text-white font-mono uppercase text-xs tracking-widest rounded-md shadow-md transition-all active:scale-95"
         >
           Proceed to Checkout <img :src="rightarrowIcon" class="h-4 w-4" />
         </button>
@@ -234,13 +235,14 @@ const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'c
                 {{ rec.name }}
               </h3>
               <p class="font-mono text-xs font-semibold mt-1">
-                KES {{ rec.price.toFixed(2) }}
+                {{ store.catalogueLoaded ? `KES ${rec.price.toFixed(2)}` : 'Loading price…' }}
               </p>
             </div>
 
             <button 
               @click="handleAddFromRecommendation(rec.id)"
-              class="self-start text-[11px] font-mono tracking-widest text-red-700 hover:text-red-500 uppercase border-b border-gold-500 pb-0.5 transition-colors"
+              :disabled="!store.catalogueLoaded"
+              class="self-start text-[11px] font-mono tracking-widest text-red-700 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-60 uppercase border-b border-gold-500 pb-0.5 transition-colors"
             >
               + Add to Bag
             </button>

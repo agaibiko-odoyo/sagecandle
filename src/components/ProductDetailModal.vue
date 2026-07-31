@@ -31,7 +31,7 @@ const decrement = () => {
 };
 
 const handleAddToBag = () => {
-  if (!product.value?.isAvailable) return;
+  if (!store.catalogueLoaded || !product.value?.isAvailable) return;
   store.addToCart(product.value.id, quantity.value);
   handleClose();
 };
@@ -93,7 +93,7 @@ const handleAddToBag = () => {
                 {{ product.collection }}
               </p>
               <p class="text-xl font-mono font-semibold">
-                KES {{ product.price.toFixed(2) }}
+                {{ store.catalogueLoaded ? `KES ${product.price.toFixed(2)}` : 'Loading price…' }}
               </p>
             </div>
           </div>
@@ -176,10 +176,11 @@ const handleAddToBag = () => {
           <!-- Add to bag button -->
           <button 
             @click="handleAddToBag"
-            class="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-gold-600 hover:bg-gold-700 dark:bg-gold-600 dark:hover:bg-gold-500 text-white font-mono uppercase text-xs tracking-widest rounded-md shadow-md transition-all active:scale-95"
+            :disabled="!store.catalogueLoaded"
+            class="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-gold-600 hover:bg-gold-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-gold-600 dark:hover:bg-gold-500 text-white font-mono uppercase text-xs tracking-widest rounded-md shadow-md transition-all active:scale-95"
           >
             <img :src="cartIcon" class="h-5.5 w-5.5 mr-1" />
-            Add to Bag — KES {{(product.price * quantity).toFixed(2)}}
+            {{ store.catalogueLoaded ? `Add to Bag — KES ${(product.price * quantity).toFixed(2)}` : 'Loading price…' }}
           </button>
         </div>
       </div>
