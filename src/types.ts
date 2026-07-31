@@ -57,4 +57,12 @@ export interface Order {
   shippingDetails: ShippingDetails;
   deliveryMethod: DeliveryMethod;
   paymentMethod: 'card' | 'mobile_pay';
+  status?: DeliveryOrderStatus;
 }
+
+export type DeliveryOrderStatus =
+  | 'awaiting_confirmation'
+  | 'order_confirmed'
+  | 'departed_store'
+  | 'out_for_delivery'
+  | 'delivered_successfully';

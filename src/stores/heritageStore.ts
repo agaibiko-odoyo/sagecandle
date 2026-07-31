@@ -15,7 +15,7 @@ import caramel from '../../assets/caramel.jpeg';
 import cubeCandles from '../../assets/cubecandles.jpeg';
 import blueberry from '../../assets/blueberry.jpeg';
 
-export type AppView = 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'checkout' | 'confirmation' | 'tracking' | 'shipment';
+export type AppView = 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'checkout' | 'confirmation' | 'tracking';
 type CollectionFilter = 'all' | Product['category'];
 
 const productDisplayOrder = [
@@ -35,7 +35,6 @@ const viewPaths: Record<AppView, string> = {
   checkout: '/checkout',
   confirmation: '/order-confirmation',
   tracking: '/track-order',
-  shipment: '/shipment-status'
 };
 
 const pathViews: Record<string, AppView> = Object.fromEntries(
@@ -502,8 +501,6 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     navigateTo('tracking');
   };
 
-  const viewShipment = () => navigateTo('shipment');
-
   const isSubmittingOrder = ref(false);
   const orderError = ref<string | null>(null);
   const paymentStatus = ref<'idle' | 'pending' | 'paid' | 'failed'>(
@@ -669,7 +666,6 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     removeFromCart,
     clearCart,
     trackOrder,
-    viewShipment,
     placeOrder
   };
 });

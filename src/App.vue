@@ -9,7 +9,6 @@ import CartView from './components/CartView.vue';
 import CheckoutView from './components/CheckoutView.vue';
 import ConfirmationView from './components/ConfirmationView.vue';
 import OrderTrackingView from './components/OrderTrackingView.vue';
-import ShipmentStatusView from './components/ShipmentStatusView.vue';
 import ProductDetailModal from './components/ProductDetailModal.vue';
 import { Moon, Sun } from 'lucide-vue-next';
 import homeIcon from '../assets/home.svg';
@@ -32,7 +31,7 @@ onBeforeUnmount(() => {
   store.destroyAuth();
 });
 
-const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'checkout' | 'confirmation' | 'tracking' | 'shipment') => store.navigateTo(view);
+const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'checkout' | 'confirmation' | 'tracking') => store.navigateTo(view);
 </script>
 
 <template>
@@ -122,8 +121,7 @@ const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'c
           store.activeView === 'cart' ? CartView :
           store.activeView === 'checkout' ? CheckoutView :
           store.activeView === 'confirmation' ? ConfirmationView :
-          store.activeView === 'tracking' ? OrderTrackingView :
-          ShipmentStatusView
+          OrderTrackingView
         " />
       </Transition>
     </main>

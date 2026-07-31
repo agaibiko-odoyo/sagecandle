@@ -3,14 +3,21 @@ import { onMounted, ref, watch } from 'vue';
 import { ClipboardList, LogOut, MapPin, Pencil, User } from 'lucide-vue-next';
 import { supabase } from '../lib/supabase';
 import { useHeritageStore } from '../stores/heritageStore';
+import type { DeliveryOrderStatus, Order, Product } from '../types';
 
 type OrderRow = {
   id: string;
   order_number: string;
   created_at: string;
   status: string;
+  address: string;
+  city: string;
+  postal_code: string | null;
+  delivery_method: string;
+  subtotal: number;
+  shipping_cost: number;
   total: number;
-  delivery_order_items: { id: number; product_name: string; quantity: number; unit_price: number }[];
+  delivery_order_items: { id: number; product_id: string; product_name: string; quantity: number; unit_price: number }[];
 };
 
 const store = useHeritageStore();
@@ -24,6 +31,42 @@ const profileMessage = ref<string | null>(null);
 const profile = ref({ firstName: '', lastName: '', email: '', phone: '', address: '', city: '', postalCode: '', deliveryNotes: '' });
 
 const statusLabel = (status: string) => status.replaceAll('_', ' ');
+
+const fallbackProduct = (item: OrderRow['delivery_order_items'][number]): Product => ({
+  id: item.product_id,
+  name: item.product_name,
+  category: 'candles',
+  price: Number(item.unit_price),
+  image: '',
+  description: '',
+  collection: 'Sage Candle',
+  tag: '',
+  details: [],
+  specifications: {},
+  isAvailable: false
+});
+
+const trackOrder = (row: OrderRow) => {
+  const order: Order = {
+    id: row.order_number,
+    date: new Date(row.created_at).toLocaleDateString(),
+    items: row.delivery_order_items.map(item => ({
+      product: store.products.find(product => product.id === item.product_id) || fallbackProduct(item),
+      quantity: item.quantity
+    })),
+    subtotal: Number(row.subtotal),
+    shippingCost: Number(row.shipping_cost),
+    total: Number(row.total),
+    shippingDetails: {
+      firstName: '', lastName: '', email: '', phone: '', mpesaReference: '',
+      address: row.address, city: row.city, postalCode: row.postal_code || '', deliveryNotes: ''
+    },
+    deliveryMethod: { id: 'saved-delivery-method', name: row.delivery_method, cost: Number(row.shipping_cost), time: '' },
+    paymentMethod: 'mobile_pay',
+    status: row.status as DeliveryOrderStatus
+  };
+  store.trackOrder(order);
+};
 
 const getAccessToken = async () => {
   const { data: { session } } = await supabase.auth.getSession();
@@ -173,7 +216,7 @@ onMounted(() => void loadOrders());
             <div class="flex justify-between gap-3 text-xs font-mono"><span class="font-semibold text-gold-700 dark:text-gold-400">{{ order.order_number }}</span><span class="capitalize text-neutral-500">{{ statusLabel(order.status) }}</span></div>
             <p class="text-[11px] text-neutral-400">{{ new Date(order.created_at).toLocaleDateString() }}</p>
             <div class="space-y-1 text-xs"><div v-for="item in order.delivery_order_items" :key="item.id" class="flex justify-between gap-3"><span>{{ item.product_name }} × {{ item.quantity }}</span><span class="font-mono">KES {{ (Number(item.unit_price) * item.quantity).toFixed(2) }}</span></div></div>
-            <div class="pt-2 border-t border-gold-100 flex justify-between text-sm"><span>Total</span><strong class="font-mono">KES {{ Number(order.total).toFixed(2) }}</strong></div>
+            <div class="pt-2 border-t border-gold-100 flex items-center justify-between gap-4 text-sm"><div><span>Total</span><strong class="ml-2 font-mono">KES {{ Number(order.total).toFixed(2) }}</strong></div><button @click="trackOrder(order)" class="border border-gold-300 px-3 py-2 text-[10px] font-mono uppercase tracking-widest text-gold-700 hover:bg-gold-50 dark:border-gold-800 dark:text-gold-400 dark:hover:bg-gold-950/20">Track order</button></div>
           </article>
         </div>
       </section>

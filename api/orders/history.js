@@ -18,14 +18,14 @@ export default async function handler(request, response) {
 
     const { data: orders, error: ordersError } = await db
       .from('delivery_orders')
-      .select('id, order_number, created_at, status, total')
+      .select('id, order_number, created_at, status, address, city, postal_code, delivery_method, subtotal, shipping_cost, total')
       .eq('user_id', userData.user.id)
       .order('created_at', { ascending: false });
     if (ordersError) throw new Error(ordersError.message);
 
     const orderIds = (orders || []).map(order => order.id);
     const { data: items, error: itemsError } = orderIds.length
-      ? await db.from('delivery_order_items').select('id, order_id, product_name, quantity, unit_price').in('order_id', orderIds)
+      ? await db.from('delivery_order_items').select('id, order_id, product_id, product_name, quantity, unit_price').in('order_id', orderIds)
       : { data: [], error: null };
     if (itemsError) throw new Error(itemsError.message);
 
