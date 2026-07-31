@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useHeritageStore } from '../stores/heritageStore';
-import { ArrowLeft } from 'lucide-vue-next';
+import { ArrowLeft, Wallet } from 'lucide-vue-next';
 
 const store = useHeritageStore();
 
@@ -80,16 +80,6 @@ const handlePlaceOrder = async () => {
             />
           </div>
           <div class="sm:col-span-2 space-y-1.5">
-            <label class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">M-Pesa Number</label>
-            <input
-              v-model="store.shippingDetails.phone"
-              type="tel"
-              class="w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500"
-              placeholder="e.g. 0712 345 678"
-              required
-            />
-          </div>
-          <div class="sm:col-span-2 space-y-1.5">
             <label class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">Address</label>
             <input 
               v-model="store.shippingDetails.address" 
@@ -151,6 +141,21 @@ const handlePlaceOrder = async () => {
               </div>
               <span class="font-mono text-xs font-semibold">KES {{ method.cost.toFixed(2) }}</span>
             </label>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h2 class="font-serif text-xl border-b border-gold-100 dark:border-gold-950 pb-2">Payment Method</h2>
+          <div class="p-5 rounded-lg border border-gold-500 bg-gold-50/20 dark:bg-gold-950/10 space-y-4">
+            <div class="flex items-center gap-2">
+              <Wallet class="h-4 w-4 text-gold-600" />
+              <span class="text-xs font-serif font-semibold">M-Pesa</span>
+            </div>
+            <div class="space-y-1.5">
+              <label class="text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">M-Pesa Number</label>
+              <input v-model="store.shippingDetails.phone" type="tel" class="w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-serif focus:outline-none focus:border-gold-500" placeholder="e.g. 0712 345 678" required />
+            </div>
+            <p class="text-[10px] text-neutral-500 dark:text-neutral-400">We will send a secure M-Pesa prompt to this number after you place the order.</p>
           </div>
         </div>
 

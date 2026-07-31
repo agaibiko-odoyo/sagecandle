@@ -397,6 +397,49 @@ export const useHeritageStore = defineStore('heritageStore', () => {
 
   const isSubmittingOrder = ref(false);
   const orderError = ref<string | null>(null);
+  const paymentStatus = ref<'idle' | 'pending' | 'paid' | 'failed'>(
+    (localStorage.getItem('paymentStatus') as 'idle' | 'pending' | 'paid' | 'failed') || 'idle'
+  );
+  const paymentMessage = ref('');
+  const pendingCheckoutRequestId = ref<string | null>(localStorage.getItem('pendingCheckoutRequestId'));
+  let paymentPollingId: number | null = null;
+
+  watch(paymentStatus, status => localStorage.setItem('paymentStatus', status));
+  watch(pendingCheckoutRequestId, reference => {
+    if (reference) localStorage.setItem('pendingCheckoutRequestId', reference);
+    else localStorage.removeItem('pendingCheckoutRequestId');
+  });
+
+  const stopPaymentStatusPolling = () => {
+    if (paymentPollingId !== null) window.clearInterval(paymentPollingId);
+    paymentPollingId = null;
+  };
+
+  const checkPaymentStatus = async () => {
+    if (!pendingCheckoutRequestId.value || paymentStatus.value !== 'pending') return;
+    const response = await fetch(`/api/mpesa/status?checkoutRequestId=${encodeURIComponent(pendingCheckoutRequestId.value)}`);
+    if (!response.ok) return;
+    const result = await response.json();
+    if (result.status === 'pending' || result.status === 'initiated') return;
+
+    paymentStatus.value = result.status === 'paid' ? 'paid' : 'failed';
+    paymentMessage.value = result.result_description || (result.status === 'paid' ? 'Payment received.' : 'Payment was not completed.');
+    pendingCheckoutRequestId.value = null;
+    stopPaymentStatusPolling();
+
+    if (result.status === 'paid') {
+      if (activeOrder.value && !orderHistory.value.some(order => order.id === activeOrder.value?.id)) {
+        orderHistory.value.unshift(activeOrder.value);
+      }
+      clearCart();
+    }
+  };
+
+  const startPaymentStatusPolling = () => {
+    stopPaymentStatusPolling();
+    void checkPaymentStatus();
+    if (paymentStatus.value === 'pending') paymentPollingId = window.setInterval(() => void checkPaymentStatus(), 3000);
+  };
 
   const placeOrder = async () => {
     if (cart.value.length === 0) return;
@@ -448,10 +491,9 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     };
 
     activeOrder.value = newOrder;
-    orderHistory.value.unshift(newOrder);
-    
-    // Clear cart and record confirmation as a browser navigation.
-    clearCart();
+    paymentStatus.value = 'pending';
+    paymentMessage.value = result.message || 'Approve the M-Pesa prompt on your phone to complete payment.';
+    pendingCheckoutRequestId.value = result.checkoutRequestId;
     navigateTo('confirmation');
     checkoutStep.value = 1;
     isSubmittingOrder.value = false;
@@ -476,6 +518,10 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     selectedDeliveryMethod,
     isSubmittingOrder,
     orderError,
+    paymentStatus,
+    paymentMessage,
+    startPaymentStatusPolling,
+    stopPaymentStatusPolling,
     activeOrder,
     orderHistory,
     trackedOrder,

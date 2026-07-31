@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useHeritageStore } from '../stores/heritageStore';
 import { BookOpen, MapPin, Calendar, Compass, ArrowRight } from 'lucide-vue-next';
-import { computed } from 'vue';
+import { computed, onBeforeUnmount, onMounted } from 'vue';
 
 const store = useHeritageStore();
 
@@ -37,6 +37,12 @@ const returnToHome = () => {
 };
 
 const trackOrder = () => store.trackOrder(store.activeOrder);
+
+onMounted(() => {
+  if (store.paymentStatus === 'pending') store.startPaymentStatusPolling();
+});
+
+onBeforeUnmount(() => store.stopPaymentStatusPolling());
 </script>
 
 <template>
@@ -50,9 +56,12 @@ const trackOrder = () => store.trackOrder(store.activeOrder);
     <!-- Main Message -->
     <div class="space-y-4 max-w-xl mx-auto">
       <span class="text-xs font-mono tracking-widest text-gold-600 dark:text-gold-400 uppercase">
-        CONFIRMATION
+        {{ store.paymentStatus === 'pending' ? 'M-PESA PAYMENT' : store.paymentStatus === 'failed' ? 'PAYMENT NOT COMPLETED' : 'CONFIRMATION' }}
       </span>
-      <h1 class="font-serif text-3xl md:text-5xl tracking-wide font-light">
+      <h1 v-if="store.paymentStatus === 'pending'" class="font-serif text-3xl md:text-5xl tracking-wide font-light">
+        Complete Payment <br /><span class="italic font-normal text-gold-600">on Your Phone</span>
+      </h1>
+      <h1 v-else class="font-serif text-3xl md:text-5xl tracking-wide font-light">
         Thank You for <br /><span class="italic font-normal text-gold-600">Honoring</span> the Heritage
       </h1>
       
@@ -63,7 +72,7 @@ const trackOrder = () => store.trackOrder(store.activeOrder);
       <div class="divider-pattern w-32 mx-auto py-1"></div>
 
       <p class="text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed font-sans font-light">
-        Your selection from the Ancestral Artisans collection has been registered. We are now carefully preparing your items for their journey from our craft studio to your home.
+        {{ store.paymentStatus === 'pending' ? store.paymentMessage || 'Approve the M-Pesa prompt on your phone. This page will update automatically once the payment is complete.' : store.paymentStatus === 'failed' ? store.paymentMessage || 'The M-Pesa payment was not completed. Return to your bag and try again.' : 'Your selection from the Ancestral Artisans collection has been registered. We are now carefully preparing your items for their journey from our craft studio to your home.' }}
       </p>
     </div>
 
@@ -122,11 +131,17 @@ const trackOrder = () => store.trackOrder(store.activeOrder);
 
     <!-- Actions -->
     <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-      <button 
+      <button v-if="store.paymentStatus !== 'pending' && store.paymentStatus !== 'failed'"
         @click="trackOrder"
         class="w-full sm:w-auto px-8 py-3.5 bg-gold-600 hover:bg-gold-500 text-white font-mono uppercase text-xs tracking-widest rounded-md shadow-md transition-all active:scale-95"
       >
         Track Order
+      </button>
+      <button v-if="store.paymentStatus === 'failed'"
+        @click="store.navigateTo('checkout')"
+        class="w-full sm:w-auto px-8 py-3.5 bg-gold-600 hover:bg-gold-500 text-white font-mono uppercase text-xs tracking-widest rounded-md shadow-md transition-all active:scale-95"
+      >
+        Try Again
       </button>
       <button 
         @click="returnToHome"
