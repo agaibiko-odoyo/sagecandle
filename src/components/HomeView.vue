@@ -2,10 +2,14 @@
 import { useHeritageStore } from '../stores/heritageStore';
 import ProductCard from './ProductCard.vue';
 import { Sparkles, ArrowRight, BookOpen, Quote, Star } from 'lucide-vue-next';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import scentedMemoriesImage from '../../assets/img18.jpeg';
 
 const store = useHeritageStore();
+const newsletterEmail = ref('');
+const newsletterMessage = ref<string | null>(null);
+const newsletterError = ref<string | null>(null);
+const subscribing = ref(false);
 
 const featuredProducts = computed(() => {
   return store.products.slice(0, 3);
@@ -13,6 +17,33 @@ const featuredProducts = computed(() => {
 
 const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'checkout' | 'confirmation') => store.navigateTo(view);
 const viewCollection = () => store.navigateTo('curated');
+
+const subscribeToNewsletter = async () => {
+  newsletterMessage.value = null;
+  newsletterError.value = null;
+  const email = newsletterEmail.value.trim();
+  if (!/^\S+@\S+\.\S+$/.test(email)) {
+    newsletterError.value = 'Enter a valid email address.';
+    return;
+  }
+
+  subscribing.value = true;
+  try {
+    const response = await fetch('/api/newsletter/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || 'Could not save your subscription.');
+    newsletterEmail.value = '';
+    newsletterMessage.value = result.message || 'You are subscribed to the Inner Circle.';
+  } catch (error) {
+    newsletterError.value = error instanceof Error ? error.message : 'Could not save your subscription.';
+  } finally {
+    subscribing.value = false;
+  }
+};
 </script>
 
 <template>
@@ -213,20 +244,26 @@ const viewCollection = () => store.navigateTo('curated');
         </p>
       </div>
 
-      <form @submit.prevent class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+      <form @submit.prevent="subscribeToNewsletter" class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
         <input 
+          v-model="newsletterEmail"
           type="email" 
           placeholder="YOUR EMAIL" 
+          autocomplete="email"
+          maxlength="320"
           class="flex-1 px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-mono tracking-wider text-center focus:outline-none focus:border-gold-500 transition-colors"
           required
         />
         <button 
           type="submit"
-          class="px-8 py-3 bg-neutral-950 dark:bg-gold-600 hover:bg-neutral-800 dark:hover:bg-gold-500 text-white font-mono uppercase text-xs tracking-widest rounded-md transition-all active:scale-95 shadow-md"
+          :disabled="subscribing"
+          class="px-8 py-3 bg-neutral-950 dark:bg-gold-600 hover:bg-neutral-800 dark:hover:bg-gold-500 text-white font-mono uppercase text-xs tracking-widest rounded-md transition-all active:scale-95 shadow-md disabled:cursor-wait disabled:opacity-60"
         >
-          Subscribe
+          {{ subscribing ? 'Subscribing…' : 'Subscribe' }}
         </button>
       </form>
+      <p v-if="newsletterMessage" role="status" class="text-xs text-gold-700 dark:text-gold-400">{{ newsletterMessage }}</p>
+      <p v-else-if="newsletterError" role="alert" class="text-xs text-red-600 dark:text-red-400">{{ newsletterError }}</p>
     </div>
   </div>
 </template>
