@@ -90,7 +90,7 @@ const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'c
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <!-- 01 Source -->
+          <!-- 01 Blend -->
           <div class="space-y-4 group">
             <div class="aspect-video rounded-lg overflow-hidden bg-neutral-900 border border-gold-100 dark:border-gold-950">
               <img 
@@ -103,15 +103,15 @@ const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'c
               />
             </div>
             <div class="space-y-2">
-              <span class="text-xs font-mono text-gold-600 dark:text-gold-400">01. THE SOURCE</span>
-              <h3 class="font-serif text-lg font-semibold">Botanical Harvesting</h3>
+              <span class="text-xs font-mono text-gold-600 dark:text-gold-400">01. THE BLEND</span>
+              <h3 class="font-serif text-lg font-semibold">Thoughtful Ingredients</h3>
               <p class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed font-light">
-                We partner with local small-scale women cooperatives in Mali and Benin to source pure shea butter, wild cold-pressed essential oils, and organic soy wax.
+                Each fragrance begins with carefully chosen scent oils and wax, selected to create a clean, comforting burn.
               </p>
             </div>
           </div>
 
-          <!-- 02 Dye -->
+          <!-- 02 Pour -->
           <div class="space-y-4 group">
             <div class="aspect-video rounded-lg overflow-hidden bg-neutral-900 border border-gold-100 dark:border-gold-950">
               <img 
@@ -124,20 +124,20 @@ const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'c
               />
             </div>
             <div class="space-y-2">
-              <span class="text-xs font-mono text-gold-600 dark:text-gold-400">02. THE SCENT</span>
-              <h3 class="font-serif text-lg font-semibold">Scent Formulation</h3>
+              <span class="text-xs font-mono text-gold-600 dark:text-gold-400">02. THE POUR</span>
+              <h3 class="font-serif text-lg font-semibold">Hand-Poured Care</h3>
               <p class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed font-light">
-                Our signatures—wood ash, smoked amber, desert resin—are developed using generational recipes that speak of sunset rituals and sacred smoke.
+                Every candle is poured in small batches, giving each scent, wick, and finish the attention it deserves.
               </p>
             </div>
           </div>
 
-          <!-- 03 Finish -->
+          <!-- 03 Vessel -->
           <div class="space-y-4 group">
             <div class="aspect-video rounded-lg overflow-hidden bg-neutral-900 border border-gold-100 dark:border-gold-950">
               <img 
                 :src="img3" 
-                alt="Clay vessels" 
+                alt="Sustainable candle vessels"
                 loading="lazy"
                 decoding="async"
                 referrerpolicy="no-referrer"
@@ -146,9 +146,9 @@ const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'c
             </div>
             <div class="space-y-2">
               <span class="text-xs font-mono text-gold-600 dark:text-gold-400">03. THE VESSEL</span>
-              <h3 class="font-serif text-lg font-semibold">Hand-Turned Clay</h3>
+              <h3 class="font-serif text-lg font-semibold">Sustainable Vessels</h3>
               <p class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed font-light">
-                The clay chalices are hand-thrown in Foumban using iron-rich volcanic soils, then pit-fired to create smoke-stained organic patterns on every jar.
+                Our candles are housed in reusable glass vessels and packaged in biodegradable bags for a gentler footprint.
               </p>
             </div>
           </div>

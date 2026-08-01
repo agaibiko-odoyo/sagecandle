@@ -16,7 +16,8 @@ const featuredProducts = computed(() => {
 });
 
 const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'checkout' | 'confirmation') => store.navigateTo(view);
-const viewCollection = () => store.navigateTo('curated');
+const viewCollection = (filter: 'all' | 'signature') => store.navigateTo('curated', { filter });
+const signatureScentsImage = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/vanilla.jpeg`;
 
 const subscribeToNewsletter = async () => {
   newsletterMessage.value = null;
@@ -153,64 +154,42 @@ const subscribeToNewsletter = async () => {
           <div class="divider-pattern w-32 mx-auto"></div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Signature Scents -->
+          <div 
+            @click="viewCollection('signature')"
+            class="group relative aspect-[3/4] rounded-lg overflow-hidden border border-gold-200/30 dark:border-gold-900/20 cursor-pointer shadow-md hover:shadow-xl transition-all"
+          >
+            <img 
+              :src="signatureScentsImage"
+              alt="Signature Scents"
+              loading="lazy"
+              decoding="async"
+              class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+            <div class="absolute bottom-6 left-6 text-white space-y-1">
+              <span class="text-[10px] font-mono tracking-widest text-gold-400 uppercase">Available now</span>
+              <h3 class="font-serif text-xl tracking-wide">Signature Scents</h3>
+            </div>
+          </div>
+
           <!-- Scented Memories -->
           <div 
-            @click="viewCollection()"
-            class="group relative aspect-[3/4] rounded-lg overflow-hidden border border-gold-200/30 dark:border-gold-900/20 cursor-pointer shadow-md hover:shadow-xl transition-all"
+            class="relative aspect-[3/4] rounded-lg overflow-hidden border border-gold-200/30 dark:border-gold-900/20 cursor-not-allowed opacity-75 grayscale shadow-md"
+            aria-label="Scented Memories, coming soon"
           >
             <img 
-          :src="scentedMemoriesImage"
-          alt="Scented Memories"
-          referrerpolicy="no-referrer"
-          loading="lazy"
-          decoding="async"
+              :src="scentedMemoriesImage"
+              alt="Scented Memories"
+              loading="lazy"
+              decoding="async"
               class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
             <div class="absolute bottom-6 left-6 text-white space-y-1">
-              <span class="text-[10px] font-mono tracking-widest text-gold-400 uppercase">Candles & Incense</span>
+              <span class="text-[10px] font-mono tracking-widest text-gold-400 uppercase">Coming soon</span>
               <h3 class="font-serif text-xl tracking-wide">Scented Memories</h3>
-            </div>
-          </div>
-
-          <!-- Aromatic Travel Tins -->
-          <div 
-            @click="viewCollection()"
-            class="group relative aspect-[3/4] rounded-lg overflow-hidden border border-gold-200/30 dark:border-gold-900/20 cursor-pointer shadow-md hover:shadow-xl transition-all"
-          >
-            <img 
-          src="https://images.unsplash.com/photo-1547887538-e3a2f32cb1cc?auto=format&fit=crop&q=80&w=600"
-          alt="Aromatic Travel Tins"
-          referrerpolicy="no-referrer"
-          loading="lazy"
-          decoding="async"
-              class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-            <div class="absolute bottom-6 left-6 text-white space-y-1">
-              <span class="text-[10px] font-mono tracking-widest text-gold-400 uppercase">Portable Aromatics</span>
-              <h3 class="font-serif text-xl tracking-wide">Aromatic Travel Tins</h3>
-            </div>
-          </div>
-
-          <!-- Vessels & Candle Accessories -->
-          <div 
-            @click="viewCollection()"
-            class="group relative aspect-[3/4] rounded-lg overflow-hidden border border-gold-200/30 dark:border-gold-900/20 cursor-pointer shadow-md hover:shadow-xl transition-all"
-          >
-            <img 
-          src="https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?auto=format&fit=crop&q=80&w=600"
-          alt="Vessels & Candle Accessories"
-          referrerpolicy="no-referrer"
-          loading="lazy"
-          decoding="async"
-              class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-            <div class="absolute bottom-6 left-6 text-white space-y-1">
-              <span class="text-[10px] font-mono tracking-widest text-gold-400 uppercase">Artisan Vessels</span>
-              <h3 class="font-serif text-xl tracking-wide">Vessels & Accessories</h3>
             </div>
           </div>
         </div>
