@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { ClipboardList, LogOut, MapPin, Pencil, User } from 'lucide-vue-next';
 import { supabase } from '../lib/supabase';
 import { useHeritageStore } from '../stores/heritageStore';
@@ -17,6 +17,7 @@ type OrderRow = {
   subtotal: number;
   shipping_cost: number;
   total: number;
+  mpesa_payment: { mpesa_reference: string | null; status: string } | null;
   delivery_order_items: { id: number; product_id: string; product_name: string; quantity: number; unit_price: number }[];
 };
 
@@ -31,6 +32,8 @@ const profileMessage = ref<string | null>(null);
 const profile = ref({ firstName: '', lastName: '', email: '', phone: '', address: '', city: '', postalCode: '', deliveryNotes: '' });
 
 const statusLabel = (status: string) => status.replaceAll('_', ' ');
+const currentOrders = computed(() => orders.value.filter(order => order.status !== 'delivered_successfully'));
+const deliveredOrders = computed(() => orders.value.filter(order => order.status === 'delivered_successfully'));
 
 const fallbackProduct = (item: OrderRow['delivery_order_items'][number]): Product => ({
   id: item.product_id,
@@ -212,12 +215,23 @@ onMounted(() => void loadOrders());
         <p v-else-if="orderError" class="text-sm text-red-600">{{ orderError }}</p>
         <p v-else-if="orders.length === 0" class="text-sm text-neutral-500">No signed-in orders yet. Future purchases made while signed in will appear here.</p>
         <div v-else class="space-y-3">
-          <article v-for="order in orders" :key="order.id" class="border border-gold-100 dark:border-gold-950 rounded-md p-4 space-y-3">
+          <p v-if="currentOrders.length" class="text-[10px] font-mono uppercase tracking-widest text-neutral-400">Current orders</p>
+          <article v-for="order in currentOrders" :key="order.id" class="border border-gold-100 dark:border-gold-950 rounded-md p-4 space-y-3">
             <div class="flex justify-between gap-3 text-xs font-mono"><span class="font-semibold text-gold-700 dark:text-gold-400">{{ order.order_number }}</span><span class="capitalize text-neutral-500">{{ statusLabel(order.status) }}</span></div>
             <p class="text-[11px] text-neutral-400">{{ new Date(order.created_at).toLocaleDateString() }}</p>
             <div class="space-y-1 text-xs"><div v-for="item in order.delivery_order_items" :key="item.id" class="flex justify-between gap-3"><span>{{ item.product_name }} × {{ item.quantity }}</span><span class="font-mono">KES {{ (Number(item.unit_price) * item.quantity).toFixed(2) }}</span></div></div>
             <div class="pt-2 border-t border-gold-100 flex items-center justify-between gap-4 text-sm"><div><span>Total</span><strong class="ml-2 font-mono">KES {{ Number(order.total).toFixed(2) }}</strong></div><button @click="trackOrder(order)" class="border border-gold-300 px-3 py-2 text-[10px] font-mono uppercase tracking-widest text-gold-700 hover:bg-gold-50 dark:border-gold-800 dark:text-gold-400 dark:hover:bg-gold-950/20">Track order</button></div>
           </article>
+          <template v-if="deliveredOrders.length">
+            <p class="pt-4 text-[10px] font-mono uppercase tracking-widest text-neutral-400">Order history</p>
+            <article v-for="order in deliveredOrders" :key="order.id" class="border border-gold-100 dark:border-gold-950 rounded-md p-4 space-y-3">
+              <div class="flex justify-between gap-3 text-xs font-mono"><span class="font-semibold text-gold-700 dark:text-gold-400">{{ order.order_number }}</span><span class="capitalize text-gold-700 dark:text-gold-400">{{ statusLabel(order.status) }}</span></div>
+              <p class="text-[11px] text-neutral-400">Delivered order · {{ new Date(order.created_at).toLocaleDateString() }}</p>
+              <div class="space-y-1 text-xs"><div v-for="item in order.delivery_order_items" :key="item.id" class="flex justify-between gap-3"><span>{{ item.product_name }} × {{ item.quantity }}</span><span class="font-mono">KES {{ (Number(item.unit_price) * item.quantity).toFixed(2) }}</span></div></div>
+              <div class="border-t border-gold-100 pt-3 text-xs text-neutral-500 dark:text-neutral-400"><p>{{ order.delivery_method }} · {{ order.address }}, {{ order.city }} {{ order.postal_code || '' }}</p><p class="mt-1">Payment method: <span class="font-mono text-neutral-700 dark:text-neutral-200">M-Pesa{{ order.mpesa_payment?.mpesa_reference ? ` · ${order.mpesa_payment.mpesa_reference}` : '' }}</span></p></div>
+              <div class="pt-2 border-t border-gold-100 flex justify-between text-sm"><span>Total</span><strong class="font-mono">KES {{ Number(order.total).toFixed(2) }}</strong></div>
+            </article>
+          </template>
         </div>
       </section>
     </template>

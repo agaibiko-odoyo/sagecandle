@@ -29,13 +29,23 @@ export default async function handler(request, response) {
       : { data: [], error: null };
     if (itemsError) throw new Error(itemsError.message);
 
+    const { data: payments, error: paymentsError } = orderIds.length
+      ? await db.from('mpesa_payments').select('order_id, mpesa_reference, status').in('order_id', orderIds)
+      : { data: [], error: null };
+    if (paymentsError) throw new Error(paymentsError.message);
+
     const itemsByOrder = new Map();
     for (const item of items || []) {
       const current = itemsByOrder.get(item.order_id) || [];
       current.push(item);
       itemsByOrder.set(item.order_id, current);
     }
-    return response.status(200).json({ orders: (orders || []).map(order => ({ ...order, delivery_order_items: itemsByOrder.get(order.id) || [] })) });
+    const paymentsByOrder = new Map((payments || []).map(payment => [payment.order_id, payment]));
+    return response.status(200).json({ orders: (orders || []).map(order => ({
+      ...order,
+      delivery_order_items: itemsByOrder.get(order.id) || [],
+      mpesa_payment: paymentsByOrder.get(order.id) || null
+    })) });
   } catch (error) {
     return response.status(500).json({ error: error instanceof Error ? error.message : 'Unable to load order history.' });
   }
