@@ -414,7 +414,17 @@ export const useHeritageStore = defineStore('heritageStore', () => {
   }
 
   const loadProductPrices = async () => {
-    const { data, error } = await supabase.from('products').select('id, price, is_active');
+    type CatalogueRow = { id: string; price: number; is_active: boolean };
+    const rpcResult = await supabase.rpc('get_storefront_catalogue');
+    let data = rpcResult.data as CatalogueRow[] | null;
+    let error = rpcResult.error;
+    // Maintains the existing active-product behaviour until the accompanying
+    // database migration has been applied.
+    if (error) {
+      const fallback = await supabase.from('products').select('id, price, is_active');
+      data = fallback.data;
+      error = fallback.error;
+    }
     if (error || !data) return;
 
     // This is intentionally a separate optional request while existing Supabase
