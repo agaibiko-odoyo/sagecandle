@@ -2,49 +2,37 @@
 import { computed } from 'vue';
 import { useHeritageStore } from '../stores/heritageStore';
 import ProductCard from './ProductCard.vue';
-import { Sparkles } from 'lucide-vue-next';
+import { Gift } from 'lucide-vue-next';
 import flameIcon from '../../assets/flame.svg';
 import potIcon from '../../assets/pottery.svg';
-import guildIcon from '../../assets/guild.svg';
 import soulIcon from '../../assets/soul.svg';
 
 const store = useHeritageStore();
 
 const activeFilter = computed({
   get: () => store.collectionFilter,
-  set: (filter: 'all' | 'candles' | 'textiles' | 'pottery') => {
+  set: (filter: 'all' | 'signature') => {
     if (filter !== store.collectionFilter) store.navigateTo('curated', { filter });
   }
 });
 
 const filteredProducts = computed(() => {
-  const visibleProducts = store.products.filter(product => product.isVisible !== false);
-  if (activeFilter.value === 'all') {
-    return [...visibleProducts].sort((a, b) => Number(b.isAvailable) - Number(a.isAvailable));
-  }
-  return visibleProducts.filter(p => p.category === activeFilter.value).sort((a, b) => Number(b.isAvailable) - Number(a.isAvailable));
+  const candleProducts = store.products.filter(product => product.isVisible !== false && product.category === 'candles');
+  const signatureIds = new Set(['sunset-nairobi', 'loomed-horizon', 'savannah-dusk', 'royal-triptych']);
+  const products = activeFilter.value === 'signature'
+    ? candleProducts.filter(product => signatureIds.has(product.id))
+    : candleProducts;
+  return [...products].sort((a, b) => Number(b.isAvailable) - Number(a.isAvailable));
 });
 
 // Description maps for category header sections
 const categoryHeader = computed(() => {
   switch (activeFilter.value) {
-    case 'candles':
+    case 'signature':
       return {
-        tag: 'Ancient Rituals',
-        title: 'Vessels of Light & Spirit',
-        desc: 'Fragrances that bridge the gap between ancestral memory and modern sanctuary. Hand-poured with native oils.'
-      };
-    case 'textiles':
-      return {
-        tag: 'Portable Aromatics',
-        title: 'Aromatic Travel Tins',
-        desc: 'Scented travel-ready formulations in reusable hand-hammered containers, made for journeys and cozy spaces.'
-      };
-    case 'pottery':
-      return {
-        tag: 'Artisan Vessel Pottery',
-        title: 'Ritual Candle Vessels & Care',
-        desc: 'Hand-turned ceramic candle holders and solid sand-cast brass care instruments to honor the light.'
+        tag: 'Signature Candles',
+        title: 'Our Essential Scents',
+        desc: 'The four candles that define Sage Candle: distinct fragrances for your most memorable moments.'
       };
     default:
       return {
@@ -63,23 +51,9 @@ const categoryHeader = computed(() => {
       <!-- Background images depending on selection -->
       <div class="absolute inset-0 z-0">
         <img 
-          v-if="activeFilter === 'candles'"
+          v-if="activeFilter === 'signature'"
           src="https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&q=80&w=1200" 
           alt="Candles collection" 
-          referrerpolicy="no-referrer"
-          class="w-full h-full object-cover brightness-50"
-        />
-        <img 
-          v-else-if="activeFilter === 'textiles'"
-          src="https://images.unsplash.com/photo-1547887538-e3a2f32cb1cc?auto=format&fit=crop&q=80&w=1200" 
-          alt="Travel Tins collection" 
-          referrerpolicy="no-referrer"
-          class="w-full h-full object-cover brightness-50"
-        />
-        <img 
-          v-else-if="activeFilter === 'pottery'"
-          src="https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?auto=format&fit=crop&q=80&w=1200" 
-          alt="Pottery collection" 
           referrerpolicy="no-referrer"
           class="w-full h-full object-cover brightness-50"
         />
@@ -133,28 +107,6 @@ const categoryHeader = computed(() => {
           >
             Signature Candles
           </button>
-          <button 
-            @click="activeFilter = 'textiles'"
-            :class="[
-              'px-6 py-2 rounded-full text-xs font-mono tracking-wider transition-all duration-300 border',
-              activeFilter === 'textiles' 
-                ? 'bg-gold-600 text-white border-gold-600 shadow-md' 
-                : 'bg-transparent text-neutral-600 dark:text-neutral-400 border-transparent hover:border-gold-300 dark:hover:border-gold-800'
-            ]"
-          >
-            Aromatic Travel Tins
-          </button>
-          <button 
-            @click="activeFilter = 'pottery'"
-            :class="[
-              'px-6 py-2 rounded-full text-xs font-mono tracking-wider transition-all duration-300 border',
-              activeFilter === 'pottery' 
-                ? 'bg-gold-600 text-white border-gold-600 shadow-md' 
-                : 'bg-transparent text-neutral-600 dark:text-neutral-400 border-transparent hover:border-gold-300 dark:hover:border-gold-800'
-            ]"
-          >
-            Ritual Care & Vessels
-          </button>
         </div>
       </div>
     </div>
@@ -207,14 +159,14 @@ const categoryHeader = computed(() => {
           </p>
         </div>
 
-        <!-- Heritage Guild -->
+        <!-- Gift-ready glow -->
         <div class="text-center space-y-3 p-4 rounded-lg bg-white/30 dark:bg-luxe-gray/30 border border-gold-100/40 dark:border-gold-950/20">
           <div class="mx-auto h-15 w-15 rounded-full bg-gold-100 dark:bg-gold-950/40 flex items-center justify-center text-gold-600 dark:text-gold-400">
-            <img :src="guildIcon" alt="" class="h-10 w-10" />
+            <Gift class="h-8 w-8" aria-hidden="true" />
           </div>
-          <h3 class="font-serif text-base font-semibold">Heritage Guild</h3>
+          <h3 class="font-serif text-base font-semibold">Gift-Ready Glow</h3>
           <p class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed max-w-xs mx-auto">
-            Direct, life-changing partnerships with independent master artisans.
+            Thoughtfully made for gifting, self-care rituals, and the moments you want to make memorable.
           </p>
         </div>
       </div>

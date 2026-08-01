@@ -16,7 +16,7 @@ import blueberry from '../../assets/blueberry.jpeg';
 import sweetPassion from '../../assets/sweetpassion.jpeg';
 
 export type AppView = 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'checkout' | 'confirmation' | 'tracking';
-type CollectionFilter = 'all' | Product['category'];
+type CollectionFilter = 'all' | 'signature' | Product['category'];
 
 const productDisplayOrder = [
   'sunset-nairobi',
@@ -139,7 +139,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     const productId = url.searchParams.get('product');
 
     activeView.value = view;
-    collectionFilter.value = filter === 'candles' || filter === 'textiles' || filter === 'pottery' ? filter : 'all';
+    collectionFilter.value = filter === 'signature' ? 'signature' : 'all';
     selectedProduct.value = productId ? products.value.find(product => product.id === productId && product.isAvailable) || null : null;
   };
 
@@ -319,7 +319,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     {
       id: 'sculpted-vase',
       name: 'Sunset Passion',
-      category: 'pottery',
+      category: 'candles',
       price: 0,
       image: sweetPassion,
       description: 'Meet Sunset Passion — where every sunset begins with a spark. Bold, warm, and captivating, Sunset Passion fills your space with an inviting aroma that lingers long after the flame is out. It’s the perfect scent for slowing down, unwinding, and embracing life’s beautiful moments. Whether you’re setting the mood for a cozy evening, enjoying a self-care ritual, or creating memories with loved ones, Sunset Passion is the finishing touch your space deserves.',

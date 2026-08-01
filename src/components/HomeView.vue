@@ -12,7 +12,7 @@ const featuredProducts = computed(() => {
 });
 
 const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'checkout' | 'confirmation') => store.navigateTo(view);
-const viewCollection = (filter: 'candles' | 'textiles' | 'pottery') => store.navigateTo('curated', { filter });
+const viewCollection = () => store.navigateTo('curated');
 </script>
 
 <template>
@@ -123,7 +123,7 @@ const viewCollection = (filter: 'candles' | 'textiles' | 'pottery') => store.nav
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <!-- Scented Memories -->
           <div 
-            @click="viewCollection('candles')"
+            @click="viewCollection()"
             class="group relative aspect-[3/4] rounded-lg overflow-hidden border border-gold-200/30 dark:border-gold-900/20 cursor-pointer shadow-md hover:shadow-xl transition-all"
           >
             <img 
@@ -141,7 +141,7 @@ const viewCollection = (filter: 'candles' | 'textiles' | 'pottery') => store.nav
 
           <!-- Aromatic Travel Tins -->
           <div 
-            @click="viewCollection('textiles')"
+            @click="viewCollection()"
             class="group relative aspect-[3/4] rounded-lg overflow-hidden border border-gold-200/30 dark:border-gold-900/20 cursor-pointer shadow-md hover:shadow-xl transition-all"
           >
             <img 
@@ -159,7 +159,7 @@ const viewCollection = (filter: 'candles' | 'textiles' | 'pottery') => store.nav
 
           <!-- Vessels & Candle Accessories -->
           <div 
-            @click="viewCollection('pottery')"
+            @click="viewCollection()"
             class="group relative aspect-[3/4] rounded-lg overflow-hidden border border-gold-200/30 dark:border-gold-900/20 cursor-pointer shadow-md hover:shadow-xl transition-all"
           >
             <img 
