@@ -6,7 +6,6 @@ import img7 from '../../assets/img7.jpeg';
 import img8 from '../../assets/img8.jpeg';
 import img9 from '../../assets/img9.jpeg';
 import img10 from '../../assets/img10.jpeg';
-import img11 from '../../assets/img11.jpeg';
 import img13 from '../../assets/img13.jpeg';
 import img14 from '../../assets/img14.jpeg';
 import vanilla from '../../assets/vanilla.jpeg';
@@ -14,6 +13,7 @@ import bubblegum from '../../assets/bubblegum.jpeg';
 import caramel from '../../assets/caramel.jpeg';
 import cubeCandles from '../../assets/cubecandles.jpeg';
 import blueberry from '../../assets/blueberry.jpeg';
+import sweetPassion from '../../assets/sweetpassion.jpeg';
 
 export type AppView = 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'checkout' | 'confirmation' | 'tracking';
 type CollectionFilter = 'all' | Product['category'];
@@ -321,20 +321,18 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       name: 'Sunset Passion',
       category: 'pottery',
       price: 0,
-      image: img11,
-      description: 'A stunning hand-turned clay vessel designed to hold our Signature candles. Coated with organic resin and pit-fired to create beautiful, smoky textures.',
-      collection: 'Vessel Pottery',
-      tag: 'Artisan Accessories',
+      image: sweetPassion,
+      description: 'Meet Sunset Passion — where every sunset begins with a spark. Bold, warm, and captivating, Sunset Passion fills your space with an inviting aroma that lingers long after the flame is out. It’s the perfect scent for slowing down, unwinding, and embracing life’s beautiful moments. Whether you’re setting the mood for a cozy evening, enjoying a self-care ritual, or creating memories with loved ones, Sunset Passion is the finishing touch your space deserves.',
+      collection: 'Scented Memories',
+      tag: 'Coming Soon',
       details: [
-        'Hand-harvested volcanic clay',
-        'Satin-matte natural charcoal finish',
-        'Waterproof inner glazing',
-        'Fits all standard 250g-300g candle jars'
+        'Warm. Inviting. Unforgettable.',
+        'A thoughtful gift for someone special—or yourself.',
+        'Hand-poured with care by Sage Candle KE.'
       ],
       specifications: {
-        'Height': '14cm',
-        'Diameter': '12cm',
-        'Material': 'Pit-Fired Volcanic Clay',
+        'Weight': '250g',
+        'Notes': 'Warm amber, soft spice, and sunset woods',
         'Origin': 'Nairobi, Kenya'
       },
       isAvailable: false
@@ -380,7 +378,8 @@ export const useHeritageStore = defineStore('heritageStore', () => {
         'Material': '100% Solid Sand-Cast Brass',
         'Origin': 'Kisumu, Kenya'
       },
-      isAvailable: false
+      isAvailable: false,
+      isVisible: false
     },
     {
       id: 'scribe-journal',
@@ -402,7 +401,8 @@ export const useHeritageStore = defineStore('heritageStore', () => {
         'Notes': 'Desert Amber, Wood Ash, Frankincense, Cardamom',
         'Origin': 'Nairobi, Kenya'
       },
-      isAvailable: false
+      isAvailable: false,
+      isVisible: false
     }
   ]);
 

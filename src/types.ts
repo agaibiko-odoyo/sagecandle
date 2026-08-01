@@ -12,6 +12,7 @@ export interface Product {
   specifications: Record<string, string>;
   isNew?: boolean;
   isAvailable: boolean;
+  isVisible?: boolean;
 }
 
 export interface Artisan {

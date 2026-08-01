@@ -18,10 +18,11 @@ const activeFilter = computed({
 });
 
 const filteredProducts = computed(() => {
+  const visibleProducts = store.products.filter(product => product.isVisible !== false);
   if (activeFilter.value === 'all') {
-    return [...store.products].sort((a, b) => Number(b.isAvailable) - Number(a.isAvailable));
+    return [...visibleProducts].sort((a, b) => Number(b.isAvailable) - Number(a.isAvailable));
   }
-  return store.products.filter(p => p.category === activeFilter.value).sort((a, b) => Number(b.isAvailable) - Number(a.isAvailable));
+  return visibleProducts.filter(p => p.category === activeFilter.value).sort((a, b) => Number(b.isAvailable) - Number(a.isAvailable));
 });
 
 // Description maps for category header sections
