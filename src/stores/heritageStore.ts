@@ -2,18 +2,6 @@ import { defineStore } from 'pinia';
 import { ref, computed, nextTick, watch } from 'vue';
 import { Product, Artisan, CartItem, ShippingDetails, DeliveryMethod, Order } from '../types';
 import { supabase } from '../lib/supabase';
-import img7 from '../../assets/img7.jpeg';
-import img8 from '../../assets/img8.jpeg';
-import img9 from '../../assets/img9.jpeg';
-import img10 from '../../assets/img10.jpeg';
-import img13 from '../../assets/img13.jpeg';
-import img14 from '../../assets/img14.jpeg';
-import vanilla from '../../assets/vanilla.jpeg';
-import bubblegum from '../../assets/bubblegum.jpeg';
-import caramel from '../../assets/caramel.jpeg';
-import cubeCandles from '../../assets/cubecandles.jpeg';
-import blueberry from '../../assets/blueberry.jpeg';
-import sweetPassion from '../../assets/sweetpassion.jpeg';
 
 export type AppView = 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'checkout' | 'confirmation' | 'tracking';
 type CollectionFilter = 'all' | 'signature' | Product['category'];
@@ -25,6 +13,8 @@ const productDisplayOrder = [
   'bogolan-throw',
   'royal-triptych'
 ];
+
+const productImage = (path: string) => `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${path}`;
 
 const viewPaths: Record<AppView, string> = {
   home: '/',
@@ -231,7 +221,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       name: 'Ivory Vanilla',
       category: 'candles',
       price: 0,
-      image: vanilla,
+      image: productImage('vanilla.jpeg'),
       description: 'Meet Ivory Vanilla — soft, warm & irresistibly addictive. A creamy vanilla scent wrapped in pure comfort. Think cozy nights, clean sheets, warm hugs, and that “what smells so good?” moment. Light it. Let the room glow. Let the scent linger.',
       cardDescription: 'Inspired by soft luxury, warm embraces, and the sweet comfort of vanilla.',
       collection: 'Scented Memories',
@@ -254,7 +244,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       name: 'Sweet Reverie',
       category: 'candles',
       price: 0,
-      image: bubblegum,
+      image: productImage('bubblegum.jpeg'),
       description: 'Your childhood favorite just got a luxury upgrade. Meet Sweet Reverie Bubblegum — sweet, playful, and irresistibly nostalgic. One light and your space transforms into a candy-sweet dream. Think bubblegum, carefree moments, soft-girl energy, and the kind of scent that makes everyone ask: “Wait… what smells THAT good?”',
       cardDescription: 'Inspired by playful sweetness, carefree moments, and the nostalgic joy of bubblegum.',
       collection: 'Scented Memories',
@@ -277,7 +267,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       name: 'Golden Caramel',
       category: 'candles',
       price: 0,
-      image: caramel,
+      image: productImage('caramel.jpeg'),
       description: 'WARNING: Golden Caramel is dangerously addictive. Sweet, buttery caramel with a rich, cozy warmth that makes your space smell like pure indulgence. Imagine warm desserts, golden evenings, soft blankets, and that luxurious feeling of having everything just right.',
       cardDescription: 'Inspired by golden moments, warm sweetness, and irresistible caramel indulgence.',
       collection: 'Scented Memories',
@@ -300,7 +290,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       name: 'Mini Cute Cube Candle',
       category: 'candles',
       price: 0,
-      image: cubeCandles,
+      image: productImage('cubecandles.jpeg'),
       description: 'Small candle. BIG personality. Meet our Mini Cute Cube Candle — tiny, adorable, and made to add the perfect little touch of luxury to any space. Whether you’re styling your bedside table, gifting your bestie, decorating your vanity, or simply treating yourself… this little cutie belongs in your collection.',
       collection: 'Scented Memories',
       tag: 'Decadent Scents',
@@ -321,7 +311,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       name: 'Sunset Passion',
       category: 'candles',
       price: 0,
-      image: sweetPassion,
+      image: productImage('sweetpassion.jpeg'),
       description: 'Meet Sunset Passion — where every sunset begins with a spark. Bold, warm, and captivating, Sunset Passion fills your space with an inviting aroma that lingers long after the flame is out. It’s the perfect scent for slowing down, unwinding, and embracing life’s beautiful moments. Whether you’re setting the mood for a cozy evening, enjoying a self-care ritual, or creating memories with loved ones, Sunset Passion is the finishing touch your space deserves.',
       collection: 'Scented Memories',
       tag: 'Coming Soon',
@@ -342,7 +332,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       name: 'Midnight Blue',
       category: 'candles',
       price: 0,
-      image: blueberry,
+      image: productImage('blueberry.jpeg'),
       description: 'Meet Midnight Blue — your new midnight obsession. Sweet, juicy blueberry wrapped in a deep, dreamy aroma that turns your space into a whole mood. Think late-night conversations, soft music, dim lights, and a little mystery.',
       collection: 'Scented Memories',
       tag: 'Decadent Scents',
@@ -362,7 +352,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       name: 'Solid Brass Candle Care Kit',
       category: 'pottery',
       price: 0,
-      image: img13,
+      image: productImage('img13.jpeg'),
       description: 'A handcrafted solid brass wick trimmer and snuffer set to care for your luxury candle flames. Enhances burn quality and keeps vessels clean.',
       collection: 'Vessel Pottery',
       tag: 'Candle Care',
@@ -386,7 +376,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       name: 'Agadez Amber Travel Tin',
       category: 'textiles',
       price: 0,
-      image: img7,
+      image: productImage('img7.jpeg'),
       description: 'A compact travel-ready scented candle in a hand-hammered brass tin. Scented with warm desert amber, wood ash, and sweet frankincense.',
       collection: 'Aromatic Travel Tins',
       tag: 'Travel Tins',

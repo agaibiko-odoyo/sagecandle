@@ -37,6 +37,8 @@ const handleAddToCart = (e: Event) => {
       <img 
         :src="product.image" 
         :alt="product.name"
+        loading="lazy"
+        decoding="async"
         referrerpolicy="no-referrer"
         class="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
       />

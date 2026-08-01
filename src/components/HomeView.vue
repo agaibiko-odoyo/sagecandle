@@ -58,6 +58,8 @@ const subscribeToNewsletter = async () => {
           src="https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&q=80&w=1600" 
           alt="Artisan Background" 
           referrerpolicy="no-referrer"
+          fetchpriority="high"
+          decoding="async"
           class="w-full h-full object-cover object-center"
         />
         <div class="absolute inset-0 bg-neutral-950/80 backdrop-brightness-75"></div>
@@ -158,9 +160,11 @@ const subscribeToNewsletter = async () => {
             class="group relative aspect-[3/4] rounded-lg overflow-hidden border border-gold-200/30 dark:border-gold-900/20 cursor-pointer shadow-md hover:shadow-xl transition-all"
           >
             <img 
-              :src="scentedMemoriesImage"
-              alt="Scented Memories" 
-              referrerpolicy="no-referrer"
+          :src="scentedMemoriesImage"
+          alt="Scented Memories"
+          referrerpolicy="no-referrer"
+          loading="lazy"
+          decoding="async"
               class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
@@ -176,9 +180,11 @@ const subscribeToNewsletter = async () => {
             class="group relative aspect-[3/4] rounded-lg overflow-hidden border border-gold-200/30 dark:border-gold-900/20 cursor-pointer shadow-md hover:shadow-xl transition-all"
           >
             <img 
-              src="https://images.unsplash.com/photo-1547887538-e3a2f32cb1cc?auto=format&fit=crop&q=80&w=600" 
-              alt="Aromatic Travel Tins" 
-              referrerpolicy="no-referrer"
+          src="https://images.unsplash.com/photo-1547887538-e3a2f32cb1cc?auto=format&fit=crop&q=80&w=600"
+          alt="Aromatic Travel Tins"
+          referrerpolicy="no-referrer"
+          loading="lazy"
+          decoding="async"
               class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
@@ -194,9 +200,11 @@ const subscribeToNewsletter = async () => {
             class="group relative aspect-[3/4] rounded-lg overflow-hidden border border-gold-200/30 dark:border-gold-900/20 cursor-pointer shadow-md hover:shadow-xl transition-all"
           >
             <img 
-              src="https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?auto=format&fit=crop&q=80&w=600" 
-              alt="Vessels & Candle Accessories" 
-              referrerpolicy="no-referrer"
+          src="https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?auto=format&fit=crop&q=80&w=600"
+          alt="Vessels & Candle Accessories"
+          referrerpolicy="no-referrer"
+          loading="lazy"
+          decoding="async"
               class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>

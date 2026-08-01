@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Sparkles, Hammer, ShieldCheck } from 'lucide-react';
 import { useHeritageStore } from '../stores/heritageStore';
-import lorettaImage from '../../assets/Lora1.webp';
+import lorettaImage from '../../assets/Lora1-optimized.jpeg';
 import img1 from '../../assets/img1.jpeg';
 import img2 from '../../assets/img2.jpeg';
 import img3 from '../../assets/img3.jpeg';
@@ -51,7 +51,7 @@ const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'c
 
         <div class="space-y-4 text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed font-light">
           <p>
-            For two decades, Loretta has studied the rare botanicals of East Africa and the Sub-Sahara. In her Nairobi atelier, she combines indigenous shea butter, desert sage, and wild-harvested resins with pure soy wax, creating candle blends that tell sensory stories of home.
+            For four years, Loretta has studied the rare botanicals of East Africa and the Sub-Sahara. In her Nairobi atelier, she combines indigenous shea butter, desert sage, and wild-harvested resins with pure soy wax, creating candle blends that tell sensory stories of home.
           </p>
           <p>
             By supporting Loretta, you help fund her apprentice program, training young women in sustainable scent-crafting, keeping generational botanical wisdom alive.
@@ -72,6 +72,8 @@ const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'c
           <img 
             :src="lorettaImage"
             alt="Loretta Rattos hand pouring candles"
+            loading="lazy"
+            decoding="async"
             class="w-full h-full object-cover"
           />
         </div>
@@ -94,6 +96,8 @@ const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'c
               <img 
                 :src="img1" 
                 alt="Botanical Harvest" 
+                loading="lazy"
+                decoding="async"
                 referrerpolicy="no-referrer"
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -113,6 +117,8 @@ const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'c
               <img 
                 :src="img2" 
                 alt="Formulation and Blend" 
+                loading="lazy"
+                decoding="async"
                 referrerpolicy="no-referrer"
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -132,6 +138,8 @@ const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'c
               <img 
                 :src="img3" 
                 alt="Clay vessels" 
+                loading="lazy"
+                decoding="async"
                 referrerpolicy="no-referrer"
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
