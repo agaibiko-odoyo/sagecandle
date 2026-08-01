@@ -2,9 +2,8 @@
 import { computed } from 'vue';
 import { useHeritageStore } from '../stores/heritageStore';
 import ProductCard from './ProductCard.vue';
-import { Gift } from 'lucide-vue-next';
+import { Gift, Leaf } from 'lucide-vue-next';
 import flameIcon from '../../assets/flame.svg';
-import potIcon from '../../assets/pottery.svg';
 import soulIcon from '../../assets/soul.svg';
 
 const store = useHeritageStore();
@@ -147,14 +146,14 @@ const categoryHeader = computed(() => {
           </p>
         </div>
 
-        <!-- Ancestral Clay -->
+        <!-- Conscious packaging -->
         <div class="text-center space-y-3 p-4 rounded-lg bg-white/30 dark:bg-luxe-gray/30 border border-gold-100/40 dark:border-gold-950/20">
           <div class="mx-auto h-15 w-15 rounded-full bg-gold-100 dark:bg-gold-950/40 flex items-center justify-center text-gold-600 dark:text-gold-400">
-            <img :src="potIcon" alt="" class="h-10 w-10" />
+            <Leaf class="h-8 w-8" style="color: #E9C349" aria-hidden="true" />
           </div>
-          <h3 class="font-serif text-base font-semibold">Ancestral Clay</h3>
+          <h3 class="font-serif text-base font-semibold">Conscious Packaging</h3>
           <p class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed max-w-xs mx-auto">
-            Hand-turned clay candle vessels and brass care tools crafted by master artisans.
+            Reusable glass and biodegradable bags protect every candle with a gentler footprint.
           </p>
         </div>
 
