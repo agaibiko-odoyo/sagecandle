@@ -45,7 +45,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
   const savedShippingDetails = JSON.parse(sessionStorage.getItem('sage_shipping_details') || '{}') as Partial<ShippingDetails>;
   const cachedCatalogue = (() => {
     try {
-      const value = JSON.parse(localStorage.getItem('sage_product_catalogue') || '{}') as Record<string, { price: number; isAvailable: boolean }>;
+      const value = JSON.parse(localStorage.getItem('sage_product_catalogue') || '{}') as Record<string, { price: number; isAvailable: boolean; imagePath?: string }>;
       return Object.values(value).every(item => Number.isFinite(item.price) && typeof item.isAvailable === 'boolean') ? value : {};
     } catch {
       return {};
@@ -415,7 +415,11 @@ export const useHeritageStore = defineStore('heritageStore', () => {
   if (catalogueLoaded.value) {
     products.value = products.value.map(product => {
       const cachedProduct = cachedCatalogue[product.id];
-      return cachedProduct ? { ...product, ...cachedProduct } : { ...product, isAvailable: false };
+      return cachedProduct ? {
+        ...product,
+        ...cachedProduct,
+        image: cachedProduct.imagePath ? supabase.storage.from('product-images').getPublicUrl(cachedProduct.imagePath).data.publicUrl : product.image
+      } : { ...product, isAvailable: false };
     });
   }
 
@@ -423,13 +427,25 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     const { data, error } = await supabase.from('products').select('id, price, is_active');
     if (error || !data) return;
 
-    const catalogue = new Map(data.map(product => [product.id, { price: Number(product.price), isAvailable: product.is_active }]));
+    // This is intentionally a separate optional request while existing Supabase
+    // projects apply the image-path migration. Prices and availability remain
+    // available even before that migration has been run.
+    const { data: imageRows } = await supabase.from('products').select('id, image_path');
+    const imagePaths = new Map((imageRows || []).map(product => [product.id, product.image_path as string | null]));
+
+    const catalogue = new Map(data.map(product => [product.id, {
+      price: Number(product.price), isAvailable: product.is_active, imagePath: imagePaths.get(product.id) || undefined
+    }]));
     products.value = products.value.map(product => {
       const databaseProduct = catalogue.get(product.id);
-      return databaseProduct ? { ...product, ...databaseProduct } : { ...product, isAvailable: false };
+      return databaseProduct ? {
+        ...product,
+        ...databaseProduct,
+        image: databaseProduct.imagePath ? supabase.storage.from('product-images').getPublicUrl(databaseProduct.imagePath).data.publicUrl : product.image
+      } : { ...product, isAvailable: false };
     });
     localStorage.setItem('sage_product_catalogue', JSON.stringify(Object.fromEntries(
-      data.map(product => [product.id, { price: Number(product.price), isAvailable: product.is_active }])
+      data.map(product => [product.id, { price: Number(product.price), isAvailable: product.is_active, imagePath: imagePaths.get(product.id) || undefined }])
     )));
     cart.value = cart.value.filter(item => products.value.find(product => product.id === item.productId)?.isAvailable);
     catalogueLoaded.value = true;
