@@ -161,7 +161,7 @@ const categoryHeader = computed(() => {
         <!-- Gift-ready glow -->
         <div class="text-center space-y-3 p-4 rounded-lg bg-white/30 dark:bg-luxe-gray/30 border border-gold-100/40 dark:border-gold-950/20">
           <div class="mx-auto h-15 w-15 rounded-full bg-gold-100 dark:bg-gold-950/40 flex items-center justify-center text-gold-600 dark:text-gold-400">
-            <Gift class="h-8 w-8 text-gold-600 dark:text-gold-400" aria-hidden="true" />
+            <Gift class="h-8 w-8" style="color: #E9C349" aria-hidden="true" />
           </div>
           <h3 class="font-serif text-base font-semibold">Gift-Ready Glow</h3>
           <p class="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed max-w-xs mx-auto">
