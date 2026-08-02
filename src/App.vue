@@ -142,7 +142,7 @@ const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'c
           <span class="text-[9px] font-mono uppercase tracking-wider">Home</span>
         </button>
 
-        <!-- Curated tab -->
+        <!-- Collections tab -->
         <button 
           @click="setView('curated')"
           :class="[
@@ -151,7 +151,7 @@ const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'c
           ]"
         >
           <img :src="curatedIcon" alt="" class="h-5 w-5 shrink-0 object-contain" />
-          <span class="text-[9px] font-mono uppercase tracking-wider">Curated</span>
+          <span class="text-[9px] font-mono uppercase tracking-wider">Collections</span>
         </button>
 
         <!-- Heritage tab -->
