@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted } from 'vue';
+import { inject, type BeforeSendEvent } from '@vercel/analytics';
 import { useHeritageStore } from './stores/heritageStore';
 import HomeView from './components/HomeView.vue';
 import CuratedView from './components/CuratedView.vue';
@@ -19,7 +20,15 @@ import orderIcon from '../assets/order.svg';
 
 const store = useHeritageStore();
 
+// Keep page-level usage analytics while omitting query-string values such as
+// collection filters and product identifiers from the recorded URL.
+const withoutAnalyticsQuery = (event: BeforeSendEvent): BeforeSendEvent => {
+  const url = new URL(event.url, window.location.origin);
+  return { ...event, url: url.pathname };
+};
+
 onMounted(() => {
+  inject({ beforeSend: withoutAnalyticsQuery });
   store.initTheme();
   store.initNavigation();
   void store.initAuth();
