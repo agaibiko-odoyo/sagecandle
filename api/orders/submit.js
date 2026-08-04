@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { createHash, randomBytes } from 'node:crypto';
+import { notifyAdmins, sendPushToUsers } from '../_lib/push.js';
 
 function supabaseAdmin() {
   const { SUPABASE_URL, SUPABASE_SECRET_KEY } = process.env;
@@ -87,6 +88,18 @@ export default async function handler(request, response) {
     if (paymentError) throw new Error('Could not record your M-Pesa reference.');
 
     await db.from('delivery_orders').update({ status: 'awaiting_confirmation' }).eq('id', order.id);
+    await Promise.all([
+      sendPushToUsers([userId], {
+        title: `Order ${order.order_number}`,
+        body: 'Order received. We will confirm your payment shortly.',
+        url: '/profile'
+      }),
+      notifyAdmins({
+        title: `New order ${order.order_number}`,
+        body: `${shippingDetails.firstName || ''} ${shippingDetails.lastName || ''}`.trim() || 'A customer',
+        url: '/'
+      })
+    ]);
     return response.status(200).json({ orderId: order.order_number, orderAccessToken, message: 'Your order is awaiting manual payment confirmation.' });
   } catch (error) {
     return response.status(400).json({ error: error instanceof Error ? error.message : 'Unable to submit order.' });

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
-import { ClipboardList, LogOut, MapPin, Pencil, User } from 'lucide-vue-next';
+import { Bell, ClipboardList, LogOut, MapPin, Pencil, User } from 'lucide-vue-next';
 import { supabase } from '../lib/supabase';
+import { enablePushNotifications, notificationPermission, pushSupported } from '../lib/push';
 import { useHeritageStore } from '../stores/heritageStore';
 import type { DeliveryOrderStatus, Order, Product } from '../types';
 
@@ -29,6 +30,9 @@ const orderError = ref<string | null>(null);
 const editingProfile = ref(false);
 const savingProfile = ref(false);
 const profileMessage = ref<string | null>(null);
+const notificationMessage = ref<string | null>(null);
+const enablingNotifications = ref(false);
+const notificationsEnabled = ref(false);
 const profile = ref({ firstName: '', lastName: '', email: '', phone: '', address: '', city: '', postalCode: '', deliveryNotes: '' });
 
 const statusLabel = (status: string) => status.replaceAll('_', ' ');
@@ -153,6 +157,22 @@ watch(() => store.authUser?.email, value => {
   if (value) email.value = value;
 });
 onMounted(() => void loadOrders());
+onMounted(async () => { notificationsEnabled.value = (await notificationPermission()) === 'granted'; });
+
+const enableNotifications = async () => {
+  enablingNotifications.value = true;
+  notificationMessage.value = null;
+  try {
+    if (!pushSupported()) throw new Error('Push notifications are not supported by this browser.');
+    await enablePushNotifications();
+    notificationsEnabled.value = true;
+    notificationMessage.value = 'Order notifications are enabled on this device.';
+  } catch (error) {
+    notificationMessage.value = error instanceof Error ? error.message : 'Could not enable notifications.';
+  } finally {
+    enablingNotifications.value = false;
+  }
+};
 </script>
 
 <template>
@@ -190,6 +210,12 @@ onMounted(() => void loadOrders());
           <div class="min-w-0"><h2 class="font-serif text-lg">Signed in</h2><p class="truncate text-xs text-neutral-500">{{ store.authUser.email }}</p></div>
         </div>
         <button @click="store.signOut" class="inline-flex items-center gap-2 text-xs font-mono uppercase text-neutral-500 hover:text-gold-700"><LogOut class="h-4 w-4" /> Sign out</button>
+      </section>
+
+      <section class="bg-white/40 dark:bg-luxe-gray/40 border border-gold-200/30 dark:border-gold-900/10 p-6 rounded-lg flex flex-wrap items-center justify-between gap-4 shadow-sm">
+        <div class="flex items-center gap-3"><Bell class="h-5 w-5 text-gold-600" /><div><h2 class="font-serif text-lg">Order notifications</h2><p class="text-xs text-neutral-500">Receive updates from order received through delivery.</p></div></div>
+        <button :disabled="notificationsEnabled || enablingNotifications" @click="enableNotifications" class="shrink-0 px-3 py-2 border border-gold-300 rounded text-[10px] font-mono uppercase tracking-widest text-gold-700 disabled:opacity-60 dark:border-gold-800 dark:text-gold-400">{{ notificationsEnabled ? 'Enabled' : enablingNotifications ? 'Enabling…' : 'Enable' }}</button>
+        <p v-if="notificationMessage" class="basis-full text-xs text-gold-700 dark:text-gold-400">{{ notificationMessage }}</p>
       </section>
 
       <section class="bg-white/40 dark:bg-luxe-gray/40 border border-gold-200/30 dark:border-gold-900/10 p-6 rounded-lg space-y-4 shadow-sm">
