@@ -2,9 +2,11 @@ import { createClient } from '@supabase/supabase-js';
 import { authenticatedUser } from '../_lib/auth.js';
 
 function userScopedDb(accessToken) {
-  return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY, {
+  // Use the publishable API key plus the verified user's JWT. Supabase's
+  // accessToken option guarantees PostgREST evaluates RLS as that user.
+  return createClient(process.env.SUPABASE_URL, process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_SECRET_KEY, {
     auth: { persistSession: false },
-    global: { headers: { Authorization: `Bearer ${accessToken}` } }
+    accessToken: async () => accessToken
   });
 }
 
