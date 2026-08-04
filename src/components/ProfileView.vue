@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { Bell, ClipboardList, LogOut, MapPin, Pencil, User } from 'lucide-vue-next';
 import { supabase } from '../lib/supabase';
-import { enablePushNotifications, hasPushSubscription, pushSupported } from '../lib/push';
+import { enablePushNotifications, hasSavedPushSubscription, pushSupported } from '../lib/push';
 import { useHeritageStore } from '../stores/heritageStore';
 import type { DeliveryOrderStatus, Order, Product } from '../types';
 
@@ -157,7 +157,7 @@ watch(() => store.authUser?.email, value => {
   if (value) email.value = value;
 });
 onMounted(() => void loadOrders());
-onMounted(async () => { notificationsEnabled.value = await hasPushSubscription(); });
+onMounted(async () => { notificationsEnabled.value = await hasSavedPushSubscription(); });
 
 const enableNotifications = async () => {
   enablingNotifications.value = true;

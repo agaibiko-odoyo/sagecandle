@@ -17,10 +17,11 @@ export async function notificationPermission() {
   return pushSupported() ? Notification.permission : 'denied';
 }
 
-export async function hasPushSubscription() {
-  if (!pushSupported() || Notification.permission !== 'granted') return false;
-  const registration = await navigator.serviceWorker.getRegistration('/push-sw.js');
-  return Boolean(await registration?.pushManager.getSubscription());
+export async function hasSavedPushSubscription() {
+  const token = await accessToken();
+  if (!token) return false;
+  const result = await fetch('/api/notifications/subscribe', { headers: { Authorization: `Bearer ${token}` } });
+  return result.ok && Boolean((await result.json().catch(() => ({}))).enabled);
 }
 
 export async function enablePushNotifications() {

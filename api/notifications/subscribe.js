@@ -4,6 +4,11 @@ export default async function handler(request, response) {
   const user = await authenticatedUser(request);
   if (!user) return response.status(401).json({ error: 'Please sign in first.' });
   const db = supabaseAdmin();
+  if (request.method === 'GET') {
+    const { data, error } = await db.from('push_subscriptions').select('id').eq('user_id', user.id).limit(1).maybeSingle();
+    if (error) return response.status(500).json({ error: `Could not check notification preference (${error.code || 'database error'}).` });
+    return response.status(200).json({ enabled: Boolean(data) });
+  }
   if (request.method === 'DELETE') {
     const { endpoint } = request.body || {};
     if (!endpoint) return response.status(400).json({ error: 'Missing subscription endpoint.' });
@@ -16,6 +21,9 @@ export default async function handler(request, response) {
   const { error } = await db.from('push_subscriptions').upsert({
     user_id: user.id, endpoint, p256dh: keys.p256dh, auth: keys.auth, updated_at: new Date().toISOString()
   }, { onConflict: 'endpoint' });
-  if (error) return response.status(500).json({ error: 'Could not save notification preference.' });
+  if (error) {
+    console.error('Could not save push subscription', { code: error.code, message: error.message, details: error.details });
+    return response.status(500).json({ error: `Could not save notification preference (${error.code || 'database error'}).` });
+  }
   return response.status(201).json({ message: 'Notifications enabled.' });
 }
