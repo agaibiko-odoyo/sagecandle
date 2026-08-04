@@ -17,11 +17,11 @@ export async function sendPushToUsers(userIds, payload) {
   const recipients = [...new Set(userIds.filter(Boolean))];
   if (!configurePush()) {
     console.warn('Push notification skipped: VAPID is not configured.');
-    return;
+    return { subscriptions: 0, accepted: 0, failed: 0, reason: 'VAPID is not configured.' };
   }
   if (!recipients.length) {
     console.warn('Push notification skipped: order has no signed-in recipient.');
-    return;
+    return { subscriptions: 0, accepted: 0, failed: 0, reason: 'No signed-in recipient.' };
   }
   const db = supabaseAdmin();
   const { data: subscriptions, error } = await db.from('push_subscriptions')
@@ -29,21 +29,25 @@ export async function sendPushToUsers(userIds, payload) {
     .in('user_id', recipients);
   if (error) {
     console.error('Could not load push subscriptions', error);
-    return;
+    return { subscriptions: 0, accepted: 0, failed: 0, reason: 'Could not load saved subscriptions.' };
   }
   if (!subscriptions?.length) {
     console.warn('Push notification skipped: no saved browser subscriptions for recipient.');
-    return;
+    return { subscriptions: 0, accepted: 0, failed: 0, reason: 'No saved browser subscriptions.' };
   }
 
-  await Promise.allSettled(subscriptions.map(async subscription => {
+  let accepted = 0;
+  let failed = 0;
+  await Promise.all(subscriptions.map(async subscription => {
     try {
       await webpush.sendNotification({
         endpoint: subscription.endpoint,
         keys: { p256dh: subscription.p256dh, auth: subscription.auth }
       }, JSON.stringify(payload));
+      accepted += 1;
       console.info('Push notification accepted by provider', { subscriptionId: subscription.id });
     } catch (error) {
+      failed += 1;
       // A 404/410 means the device unsubscribed; retaining it only causes
       // future delivery attempts to fail.
       if (error?.statusCode === 404 || error?.statusCode === 410) {
@@ -52,6 +56,7 @@ export async function sendPushToUsers(userIds, payload) {
       console.error('Push delivery failed', error?.message || error);
     }
   }));
+  return { subscriptions: subscriptions.length, accepted, failed };
 }
 
 export async function notifyAdmins(payload) {

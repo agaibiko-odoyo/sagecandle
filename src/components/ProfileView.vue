@@ -32,6 +32,7 @@ const savingProfile = ref(false);
 const profileMessage = ref<string | null>(null);
 const notificationMessage = ref<string | null>(null);
 const enablingNotifications = ref(false);
+const testingNotifications = ref(false);
 const notificationsEnabled = ref(false);
 const profile = ref({ firstName: '', lastName: '', email: '', phone: '', address: '', city: '', postalCode: '', deliveryNotes: '' });
 
@@ -173,6 +174,25 @@ const enableNotifications = async () => {
     enablingNotifications.value = false;
   }
 };
+
+const testNotifications = async () => {
+  testingNotifications.value = true;
+  notificationMessage.value = null;
+  try {
+    const token = await getAccessToken();
+    const response = await fetch('/api/notifications/test', { method: 'POST', headers: { Authorization: `Bearer ${token || ''}` } });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || 'Could not send a test notification.');
+    const delivery = result.delivery;
+    notificationMessage.value = delivery.accepted
+      ? `Test accepted by the push provider for ${delivery.accepted} device${delivery.accepted === 1 ? '' : 's'}.`
+      : `Test not sent: ${delivery.reason || 'no active device subscription found.'}`;
+  } catch (error) {
+    notificationMessage.value = error instanceof Error ? error.message : 'Could not send a test notification.';
+  } finally {
+    testingNotifications.value = false;
+  }
+};
 </script>
 
 <template>
@@ -214,7 +234,7 @@ const enableNotifications = async () => {
 
       <section class="bg-white/40 dark:bg-luxe-gray/40 border border-gold-200/30 dark:border-gold-900/10 p-6 rounded-lg flex flex-wrap items-center justify-between gap-4 shadow-sm">
         <div class="flex items-center gap-3"><Bell class="h-5 w-5 text-gold-600" /><div><h2 class="font-serif text-lg">Order notifications</h2><p class="text-xs text-neutral-500">Receive updates from order received through delivery.</p></div></div>
-        <button :disabled="enablingNotifications" @click="enableNotifications" class="shrink-0 px-3 py-2 border border-gold-300 rounded text-[10px] font-mono uppercase tracking-widest text-gold-700 disabled:opacity-60 dark:border-gold-800 dark:text-gold-400">{{ enablingNotifications ? 'Enabling…' : notificationsEnabled ? 'Refresh' : 'Enable' }}</button>
+        <div class="flex shrink-0 gap-2"><button :disabled="testingNotifications" @click="testNotifications" class="px-3 py-2 border border-gold-300 rounded text-[10px] font-mono uppercase tracking-widest text-gold-700 disabled:opacity-60 dark:border-gold-800 dark:text-gold-400">{{ testingNotifications ? 'Testing…' : 'Send test' }}</button><button :disabled="enablingNotifications" @click="enableNotifications" class="px-3 py-2 border border-gold-300 rounded text-[10px] font-mono uppercase tracking-widest text-gold-700 disabled:opacity-60 dark:border-gold-800 dark:text-gold-400">{{ enablingNotifications ? 'Enabling…' : notificationsEnabled ? 'Refresh' : 'Enable' }}</button></div>
         <p v-if="notificationMessage" class="basis-full text-xs text-gold-700 dark:text-gold-400">{{ notificationMessage }}</p>
       </section>
 
