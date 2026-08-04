@@ -14,12 +14,27 @@ function configurePush() {
 }
 
 export async function sendPushToUsers(userIds, payload) {
-  if (!configurePush() || !userIds.filter(Boolean).length) return;
+  const recipients = [...new Set(userIds.filter(Boolean))];
+  if (!configurePush()) {
+    console.warn('Push notification skipped: VAPID is not configured.');
+    return;
+  }
+  if (!recipients.length) {
+    console.warn('Push notification skipped: order has no signed-in recipient.');
+    return;
+  }
   const db = supabaseAdmin();
   const { data: subscriptions, error } = await db.from('push_subscriptions')
     .select('id, endpoint, p256dh, auth')
-    .in('user_id', [...new Set(userIds.filter(Boolean))]);
-  if (error || !subscriptions?.length) return;
+    .in('user_id', recipients);
+  if (error) {
+    console.error('Could not load push subscriptions', error);
+    return;
+  }
+  if (!subscriptions?.length) {
+    console.warn('Push notification skipped: no saved browser subscriptions for recipient.');
+    return;
+  }
 
   await Promise.allSettled(subscriptions.map(async subscription => {
     try {
@@ -27,6 +42,7 @@ export async function sendPushToUsers(userIds, payload) {
         endpoint: subscription.endpoint,
         keys: { p256dh: subscription.p256dh, auth: subscription.auth }
       }, JSON.stringify(payload));
+      console.info('Push notification accepted by provider', { subscriptionId: subscription.id });
     } catch (error) {
       // A 404/410 means the device unsubscribed; retaining it only causes
       // future delivery attempts to fail.
@@ -40,7 +56,10 @@ export async function sendPushToUsers(userIds, payload) {
 
 export async function notifyAdmins(payload) {
   const emails = (process.env.ADMIN_EMAILS || '').split(',').map(value => value.trim().toLowerCase()).filter(Boolean);
-  if (!emails.length) return;
+  if (!emails.length) {
+    console.warn('Admin push notification skipped: ADMIN_EMAILS is not configured.');
+    return;
+  }
   const { data: users } = await supabaseAdmin().auth.admin.listUsers({ perPage: 1000 });
   await sendPushToUsers((users?.users || []).filter(user => emails.includes((user.email || '').toLowerCase())).map(user => user.id), payload);
 }
