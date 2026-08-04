@@ -214,7 +214,7 @@ const enableNotifications = async () => {
 
       <section class="bg-white/40 dark:bg-luxe-gray/40 border border-gold-200/30 dark:border-gold-900/10 p-6 rounded-lg flex flex-wrap items-center justify-between gap-4 shadow-sm">
         <div class="flex items-center gap-3"><Bell class="h-5 w-5 text-gold-600" /><div><h2 class="font-serif text-lg">Order notifications</h2><p class="text-xs text-neutral-500">Receive updates from order received through delivery.</p></div></div>
-        <button :disabled="notificationsEnabled || enablingNotifications" @click="enableNotifications" class="shrink-0 px-3 py-2 border border-gold-300 rounded text-[10px] font-mono uppercase tracking-widest text-gold-700 disabled:opacity-60 dark:border-gold-800 dark:text-gold-400">{{ notificationsEnabled ? 'Enabled' : enablingNotifications ? 'Enabling…' : 'Enable' }}</button>
+        <button :disabled="enablingNotifications" @click="enableNotifications" class="shrink-0 px-3 py-2 border border-gold-300 rounded text-[10px] font-mono uppercase tracking-widest text-gold-700 disabled:opacity-60 dark:border-gold-800 dark:text-gold-400">{{ enablingNotifications ? 'Enabling…' : notificationsEnabled ? 'Refresh' : 'Enable' }}</button>
         <p v-if="notificationMessage" class="basis-full text-xs text-gold-700 dark:text-gold-400">{{ notificationMessage }}</p>
       </section>
 

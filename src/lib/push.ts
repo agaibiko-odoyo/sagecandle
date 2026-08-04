@@ -34,6 +34,10 @@ export async function enablePushNotifications() {
   // A newly registered worker may still be installing. PushManager only
   // accepts subscriptions once there is an active worker for this page.
   const registration = await navigator.serviceWorker.ready;
+  // VAPID public keys are bound to a browser subscription. Replace a stale
+  // subscription so a key rotation cannot silently prevent delivery.
+  const existingSubscription = await registration.pushManager.getSubscription();
+  if (existingSubscription) await existingSubscription.unsubscribe();
   const subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: base64UrlToUint8Array(vapidKey) });
   const result = await fetch('/api/notifications/subscribe', {
     method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(subscription)
