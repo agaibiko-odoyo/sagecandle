@@ -1,9 +1,18 @@
-import { authenticatedUser, supabaseAdmin } from '../_lib/auth.js';
+import { createClient } from '@supabase/supabase-js';
+import { authenticatedUser } from '../_lib/auth.js';
+
+function userScopedDb(accessToken) {
+  return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY, {
+    auth: { persistSession: false },
+    global: { headers: { Authorization: `Bearer ${accessToken}` } }
+  });
+}
 
 export default async function handler(request, response) {
   const user = await authenticatedUser(request);
   if (!user) return response.status(401).json({ error: 'Please sign in first.' });
-  const db = supabaseAdmin();
+  const accessToken = request.headers.authorization?.replace(/^Bearer\s+/i, '');
+  const db = userScopedDb(accessToken);
   if (request.method === 'GET') {
     const { data, error } = await db.from('push_subscriptions').select('id').eq('user_id', user.id).limit(1).maybeSingle();
     if (error) return response.status(500).json({ error: `Could not check notification preference (${error.code || 'database error'}).` });
