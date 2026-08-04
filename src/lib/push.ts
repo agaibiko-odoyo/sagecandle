@@ -17,13 +17,22 @@ export async function notificationPermission() {
   return pushSupported() ? Notification.permission : 'denied';
 }
 
+export async function hasPushSubscription() {
+  if (!pushSupported() || Notification.permission !== 'granted') return false;
+  const registration = await navigator.serviceWorker.getRegistration('/push-sw.js');
+  return Boolean(await registration?.pushManager.getSubscription());
+}
+
 export async function enablePushNotifications() {
   const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
   const token = await accessToken();
   if (!pushSupported() || !vapidKey || !token) throw new Error('Notifications are not configured for this browser.');
   const permission = await Notification.requestPermission();
   if (permission !== 'granted') throw new Error('Notification permission was not granted.');
-  const registration = await navigator.serviceWorker.register('/push-sw.js');
+  await navigator.serviceWorker.register('/push-sw.js');
+  // A newly registered worker may still be installing. PushManager only
+  // accepts subscriptions once there is an active worker for this page.
+  const registration = await navigator.serviceWorker.ready;
   const subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: base64UrlToUint8Array(vapidKey) });
   const result = await fetch('/api/notifications/subscribe', {
     method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(subscription)
