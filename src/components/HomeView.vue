@@ -3,7 +3,6 @@ import { useHeritageStore } from '../stores/heritageStore';
 import ProductCard from './ProductCard.vue';
 import { Sparkles, ArrowRight, BookOpen, Quote, Star } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
-import scentedMemoriesImage from '../../assets/img18.jpeg';
 import icedLatteImage from '../../assets/icedlatte.jpeg';
 
 const store = useHeritageStore();
@@ -155,7 +154,7 @@ const subscribeToNewsletter = async () => {
           <div class="divider-pattern w-32 mx-auto"></div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <!-- Signature Scents -->
           <div
             @click="viewCollection('signature')"
@@ -172,25 +171,6 @@ const subscribeToNewsletter = async () => {
             <div class="absolute bottom-6 left-6 text-white space-y-1">
               <span class="text-[10px] font-mono tracking-widest text-gold-400 uppercase">Available now</span>
               <h3 class="font-serif text-xl tracking-wide">Signature Scents</h3>
-            </div>
-          </div>
-
-          <!-- Scented Memories -->
-          <div 
-            class="relative aspect-[3/4] rounded-lg overflow-hidden border border-gold-200/30 dark:border-gold-900/20 cursor-not-allowed opacity-75 grayscale shadow-md"
-            aria-label="Scented Memories, coming soon"
-          >
-            <img 
-              :src="scentedMemoriesImage"
-              alt="Scented Memories"
-              loading="lazy"
-              decoding="async"
-              class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-            <div class="absolute bottom-6 left-6 text-white space-y-1">
-              <span class="text-[10px] font-mono tracking-widest text-gold-400 uppercase">Coming soon</span>
-              <h3 class="font-serif text-xl tracking-wide">Scented Memories</h3>
             </div>
           </div>
 

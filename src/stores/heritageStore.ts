@@ -192,8 +192,8 @@ export const useHeritageStore = defineStore('heritageStore', () => {
   });
   
   const deliveryMethods = ref<DeliveryMethod[]>([
-    { id: 'standard', name: 'Sage Standard Courier', cost: 100.00, time: '3-5 Business Days' },
-    { id: 'express', name: 'Sage Express Courier', cost: 150.00, time: 'Next Day Delivery' }
+    { id: 'standard', name: 'Sage Standard Courier', cost: 150.00, time: '3-5 Business Days' },
+    { id: 'express', name: 'Sage Express Courier', cost: 250.00, time: 'Next Day Delivery' }
   ]);
 
   watch(shippingDetails, details => {
