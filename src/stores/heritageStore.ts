@@ -2,16 +2,19 @@ import { defineStore } from 'pinia';
 import { ref, computed, nextTick, watch } from 'vue';
 import { Product, Artisan, CartItem, ShippingDetails, DeliveryMethod, Order } from '../types';
 import { supabase } from '../lib/supabase';
+import icedLatteImage from '../../assets/icedlatte.jpeg';
 
 export type AppView = 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'checkout' | 'confirmation' | 'tracking';
-type CollectionFilter = 'all' | 'signature' | Product['category'];
+type CollectionFilter = 'all' | 'signature' | 'gift';
 
 const productDisplayOrder = [
   'sunset-nairobi',
   'loomed-horizon',
   'savannah-dusk',
+  'royal-triptych',
   'bogolan-throw',
-  'royal-triptych'
+  'sculpted-vase',
+  'iced-latte'
 ];
 
 const productImage = (path: string) => `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/product-images/${path}`;
@@ -129,7 +132,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     const productId = url.searchParams.get('product');
 
     activeView.value = view;
-    collectionFilter.value = filter === 'signature' ? 'signature' : 'all';
+    collectionFilter.value = filter === 'signature' || filter === 'gift' ? filter : 'all';
     selectedProduct.value = productId ? products.value.find(product => product.id === productId && product.isAvailable) || null : null;
   };
 
@@ -348,6 +351,28 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       isAvailable: true
     },
     {
+      id: 'iced-latte',
+      name: 'Iced Latte',
+      category: 'candles',
+      price: 0,
+      image: icedLatteImage,
+      description: 'Bold yet comforting. Familiar yet refreshing. Inspired by the first sip of a perfectly crafted iced coffee, this scent blends creamy sweetness with rich roasted warmth to create a cozy café atmosphere wherever you are. It\'s the fragrance of slow mornings, creative afternoons, and peaceful moments made just for you.',
+      collection: 'Gift',
+      tag: 'Decadent Scents',
+      details: [
+        'Chilly evenings, cozy nights',
+        'Bringing warmth to your space',
+        'Tired Mondays',
+        'Gifting your parents'
+      ],
+      specifications: {
+        'Weight': '220g',
+        'Notes': 'Coffe,',
+        'Origin': 'Nairobi, Kenya'
+      },
+      isAvailable: false
+    },
+    {
       id: 'beaded-choker',
       name: 'Solid Brass Candle Care Kit',
       category: 'pottery',
@@ -408,7 +433,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       return cachedProduct ? {
         ...product,
         ...cachedProduct,
-        image: cachedProduct.imagePath ? supabase.storage.from('product-images').getPublicUrl(cachedProduct.imagePath).data.publicUrl : product.image
+        image: product.id === 'iced-latte' ? product.image : cachedProduct.imagePath ? supabase.storage.from('product-images').getPublicUrl(cachedProduct.imagePath).data.publicUrl : product.image
       } : { ...product, isAvailable: false };
     });
   }
@@ -441,7 +466,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       return databaseProduct ? {
         ...product,
         ...databaseProduct,
-        image: databaseProduct.imagePath ? supabase.storage.from('product-images').getPublicUrl(databaseProduct.imagePath).data.publicUrl : product.image
+        image: product.id === 'iced-latte' ? product.image : databaseProduct.imagePath ? supabase.storage.from('product-images').getPublicUrl(databaseProduct.imagePath).data.publicUrl : product.image
       } : { ...product, isAvailable: false };
     });
     localStorage.setItem('sage_product_catalogue', JSON.stringify(Object.fromEntries(

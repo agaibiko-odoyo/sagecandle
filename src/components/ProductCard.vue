@@ -95,7 +95,7 @@ const handleAddToCart = (e: Event) => {
 
       <div class="mt-4 flex items-center justify-between pt-3 border-t border-gold-100/30 dark:border-gold-950/20">
         <span class="font-mono text-base font-semibold text-neutral-900 dark:text-neutral-100">
-          {{ store.catalogueLoaded ? `KES ${product.price.toFixed(2)}` : 'Loading price…' }}
+          {{ product.isAvailable ? (store.catalogueLoaded ? `KES ${product.price.toFixed(2)}` : 'Loading price…') : 'Coming Soon' }}
         </span>
         <button v-if="store.catalogueLoaded && product.isAvailable"
           @click.stop="handleAddToCart"

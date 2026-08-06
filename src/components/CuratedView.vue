@@ -11,7 +11,7 @@ const signatureCandleIds = new Set(['sunset-nairobi', 'loomed-horizon', 'savanna
 
 const activeFilter = computed(() => store.collectionFilter);
 
-const selectCollection = (filter: 'all' | 'signature') => {
+const selectCollection = (filter: 'all' | 'signature' | 'gift') => {
   if (filter !== store.collectionFilter) store.navigateTo('curated', { filter });
 };
 
@@ -19,6 +19,8 @@ const filteredProducts = computed(() => {
   const candleProducts = store.products.filter(product => product.isVisible !== false && product.category === 'candles');
   const products = activeFilter.value === 'signature'
     ? candleProducts.filter(product => signatureCandleIds.has(product.id))
+    : activeFilter.value === 'gift'
+      ? candleProducts.filter(product => product.collection === 'Gift')
     : candleProducts;
   return [...products].sort((a, b) => Number(b.isAvailable) - Number(a.isAvailable));
 });
@@ -31,6 +33,12 @@ const categoryHeader = computed(() => {
         tag: 'Signature Candles',
         title: 'Our Essential Scents',
         desc: 'The four candles that define Sage Candle: distinct fragrances for your most memorable moments.'
+      };
+    case 'gift':
+      return {
+        tag: 'Gift Collection',
+        title: 'Made for Giving',
+        desc: 'Thoughtful scents for the people and moments worth celebrating.'
       };
     default:
       return {
@@ -83,12 +91,12 @@ const categoryHeader = computed(() => {
     <div class="max-w-7xl mx-auto px-6">
       <div class="flex items-center justify-center border-b border-gold-200/40 dark:border-gold-900/30 pb-4">
         <div class="flex flex-wrap gap-2 justify-center">
-          <button 
+          <button
             @click="selectCollection('all')"
             :class="[
               'px-6 py-2 rounded-full text-xs font-mono tracking-wider transition-all duration-300 border',
               activeFilter === 'all' 
-                ? 'bg-gold-600 text-white border-gold-600 shadow-md' 
+                ? 'bg-gold-600 text-white border-gold-600 shadow-md'
                 : 'bg-transparent text-neutral-600 dark:text-neutral-400 border-transparent hover:border-gold-300 dark:hover:border-gold-800'
             ]"
           >
@@ -104,6 +112,17 @@ const categoryHeader = computed(() => {
             ]"
           >
             Signature Candles
+          </button>
+          <button
+            @click="selectCollection('gift')"
+            :class="[
+              'px-6 py-2 rounded-full text-xs font-mono tracking-wider transition-all duration-300 border',
+              activeFilter === 'gift'
+                ? 'bg-gold-600 text-white border-gold-600 shadow-md'
+                : 'bg-transparent text-neutral-600 dark:text-neutral-400 border-transparent hover:border-gold-300 dark:hover:border-gold-800'
+            ]"
+          >
+            Gift
           </button>
         </div>
       </div>
