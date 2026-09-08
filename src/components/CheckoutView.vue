@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useHeritageStore } from '../stores/heritageStore';
 import { ArrowLeft, Wallet } from 'lucide-vue-next';
 
@@ -17,11 +17,13 @@ const handlePlaceOrder = async () => {
       if (typeof value === 'string') store.shippingDetails[field] = value;
     }
   }
-  const mpesaInput = document.querySelector<HTMLInputElement>('input[name="mpesaReference"]');
-  if (mpesaInput) store.shippingDetails.mpesaReference = mpesaInput.value.toUpperCase();
   await store.placeOrder();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
+
+// The hosted checkout iframe (payment_system) posts status updates back to this window.
+onMounted(() => store.initCheckoutMessageListener());
+onUnmounted(() => store.destroyCheckoutMessageListener());
 </script>
 
 <template>
@@ -169,26 +171,35 @@ const handlePlaceOrder = async () => {
           </div>
         </div>
 
-        <div class="rounded-lg border border-gold-300/70 bg-gold-50/50 p-5 dark:border-gold-800 dark:bg-gold-950/15 space-y-2">
+        <div v-if="!store.checkoutUrl" class="rounded-lg border border-gold-300/70 bg-gold-50/50 p-5 dark:border-gold-800 dark:bg-gold-950/15 space-y-2">
           <p class="text-[10px] font-mono uppercase tracking-widest text-gold-700 dark:text-gold-400">Payment instructions</p>
-          <p class="font-serif text-base text-neutral-800 dark:text-neutral-100">Send your payment to M-Pesa number <span class="font-mono font-semibold text-gold-700 dark:text-gold-400">0790019174</span>.</p>
-          <p class="text-xs leading-relaxed text-neutral-600 dark:text-neutral-400">After paying the full order amount, paste the M-Pesa reference code from your confirmation message into the field below. We will confirm your order manually.</p>
-          <p class="text-xs leading-relaxed text-red-700 dark:text-red-300">Payments below the full order amount will be reversed, and products will not be delivered.</p>
+          <p class="font-serif text-base text-neutral-800 dark:text-neutral-100">Pay securely with M-Pesa or AstroPay once you submit your order below.</p>
+          <p class="text-xs leading-relaxed text-neutral-600 dark:text-neutral-400">A secure payment window will open on this page — enter your M-Pesa number there and confirm the prompt on your phone. Your order updates automatically once payment is received.</p>
         </div>
 
-        <div class="space-y-4">
+        <div class="space-y-4" v-if="!store.checkoutUrl">
           <h2 class="font-serif text-xl border-b border-gold-100 dark:border-gold-950 pb-2">Payment Method</h2>
-          <div class="p-5 rounded-lg border border-gold-500 bg-gold-50/20 dark:bg-gold-950/10 space-y-4">
+          <div class="p-5 rounded-lg border border-gold-500 bg-gold-50/20 dark:bg-gold-950/10 space-y-2">
             <div class="flex items-center gap-2">
               <Wallet class="h-4 w-4 text-gold-600" />
-              <span class="text-xs font-serif font-semibold">M-Pesa</span>
+              <span class="text-xs font-serif font-semibold">M-Pesa &amp; AstroPay</span>
             </div>
-            <div class="space-y-1.5">
-              <label class="shipping-label text-[10px] font-mono uppercase tracking-wider text-neutral-400 block">M-Pesa Reference Code</label>
-              <input v-model="store.shippingDetails.mpesaReference" name="mpesaReference" @input="store.shippingDetails.mpesaReference = store.shippingDetails.mpesaReference.toUpperCase()" type="text" maxlength="10" class="shipping-input w-full px-4 py-3 border border-gold-300 dark:border-gold-800 rounded-md bg-transparent text-xs font-mono uppercase focus:outline-none focus:border-gold-500" placeholder="e.g. UGV3L251HQ" required />
-            </div>
-            <p class="text-[10px] text-neutral-500 dark:text-neutral-400">Submit the reference shown after completing your M-Pesa payment. We will confirm it manually.</p>
+            <p class="text-[10px] text-neutral-500 dark:text-neutral-400">Submit your order to open a secure payment window right here — no need to leave this page.</p>
           </div>
+        </div>
+
+        <!-- Hosted checkout: appears once an order + payment session have been created. -->
+        <div class="space-y-4" v-else>
+          <h2 class="font-serif text-xl border-b border-gold-100 dark:border-gold-950 pb-2">Complete Payment</h2>
+          <div class="rounded-lg border border-gold-300/70 dark:border-gold-800 overflow-hidden bg-white dark:bg-luxe-gray">
+            <iframe
+              :src="store.checkoutUrl"
+              title="Secure checkout"
+              class="w-full"
+              style="height: 480px; border: 0;"
+            ></iframe>
+          </div>
+          <p v-if="store.paymentMessage" class="text-xs text-neutral-500 dark:text-neutral-400">{{ store.paymentMessage }}</p>
         </div>
 
       </div>
@@ -246,12 +257,13 @@ const handlePlaceOrder = async () => {
         </div>
 
         <p v-if="store.orderError" class="text-xs text-red-600" role="alert">{{ store.orderError }}</p>
-        <button 
+        <button
+          v-if="!store.checkoutUrl"
           @click="handlePlaceOrder"
           :disabled="!store.catalogueLoaded || store.isSubmittingOrder || store.cart.length === 0"
           class="w-full flex items-center justify-center gap-2 py-4 bg-gold-600 hover:bg-gold-500 dark:bg-gold-600 dark:hover:bg-gold-500 text-white font-mono uppercase text-xs tracking-widest rounded-md shadow-md transition-all active:scale-95"
         >
-          {{ store.isSubmittingOrder ? 'Submitting order…' : store.catalogueLoaded ? `Submit Order — KES ${store.cartTotal.toFixed(2)} →` : 'Loading secure prices…' }}
+          {{ store.isSubmittingOrder ? 'Preparing payment…' : store.catalogueLoaded ? `Submit Order — KES ${store.cartTotal.toFixed(2)} →` : 'Loading secure prices…' }}
         </button>
 
         <!-- Back link -->

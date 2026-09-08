@@ -549,7 +549,11 @@ export const useHeritageStore = defineStore('heritageStore', () => {
   );
   const paymentMessage = ref('');
   const orderAccessToken = ref<string | null>(sessionStorage.getItem('sage_order_token'));
+  // Hosted checkout iframe URL (payment_system). Set once startCheckout() opens a session;
+  // cleared once the shopper's payment resolves (see checkPaymentStatus) or a new order starts.
+  const checkoutUrl = ref<string | null>(null);
   let paymentPollingId: number | null = null;
+  let checkoutMessageListener: ((event: MessageEvent) => void) | null = null;
 
   watch(orderAccessToken, token => {
     if (token) sessionStorage.setItem('sage_order_token', token);
@@ -571,6 +575,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     paymentStatus.value = result.status === 'paid' ? 'paid' : 'failed';
     paymentMessage.value = result.result_description || (result.status === 'paid' ? 'Payment received.' : 'Payment was not completed.');
     orderAccessToken.value = null;
+    checkoutUrl.value = null;
     stopPaymentStatusPolling();
 
     if (result.status === 'paid') {
@@ -587,6 +592,10 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     if (paymentStatus.value === 'pending') paymentPollingId = window.setInterval(() => void checkPaymentStatus(), 3000);
   };
 
+  // Opens a hosted checkout session (payment_system, embedded via <iframe> in CheckoutView)
+  // instead of asking the shopper to paste a manual M-Pesa reference. The order is created
+  // up-front with status 'awaiting_payment'; checkPaymentStatus() (unchanged) keeps polling
+  // /api/mpesa/status the same way it always has once the iframe hands off to a provider.
   const placeOrder = async () => {
     if (!catalogueLoaded.value || cart.value.length === 0) return;
 
@@ -607,14 +616,8 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     isSubmittingOrder.value = true;
     orderError.value = null;
 
-    if (!/^[A-Z0-9]{10}$/.test(shippingDetails.value.mpesaReference.trim().toUpperCase())) {
-      orderError.value = 'Enter a valid 10-character M-Pesa reference code.';
-      isSubmittingOrder.value = false;
-      return;
-    }
-
     const { data: { session } } = await supabase.auth.getSession();
-    const response = await fetch('/api/orders/submit', {
+    const response = await fetch('/api/checkout/create-session', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -627,8 +630,8 @@ export const useHeritageStore = defineStore('heritageStore', () => {
       })
     });
     const result = await response.json().catch(() => ({}));
-    if (!response.ok || !result.orderId) {
-      orderError.value = result.error || 'We could not start the M-Pesa payment. Please try again.';
+    if (!response.ok || !result.orderId || !result.checkoutUrl) {
+      orderError.value = result.error || 'We could not start your payment. Please try again.';
       isSubmittingOrder.value = false;
       return;
     }
@@ -651,13 +654,37 @@ export const useHeritageStore = defineStore('heritageStore', () => {
 
     activeOrder.value = newOrder;
     paymentStatus.value = 'pending';
-    paymentMessage.value = result.message || 'Your order is awaiting manual payment confirmation.';
+    paymentMessage.value = result.message || 'Complete your payment to confirm this order.';
     orderAccessToken.value = result.orderAccessToken;
+    checkoutUrl.value = result.checkoutUrl;
     clearCart();
-    shippingDetails.value.mpesaReference = '';
-    navigateTo('confirmation');
-    checkoutStep.value = 1;
+    startPaymentStatusPolling();
+    checkoutStep.value = 3;
     isSubmittingOrder.value = false;
+  };
+
+  // Listens for the hosted checkout iframe's postMessage events (see checkout.html in
+  // payment_system) so the UI can react immediately instead of waiting for the next poll tick.
+  const initCheckoutMessageListener = () => {
+    if (checkoutMessageListener) return;
+    checkoutMessageListener = (event: MessageEvent) => {
+      const data = event.data;
+      if (!data || data.source !== 'payment-system-checkout') return;
+      if (data.type === 'completed') {
+        void checkPaymentStatus();
+      } else if (data.type === 'failed') {
+        paymentMessage.value = 'Payment failed or was declined.';
+        void checkPaymentStatus();
+      } else if (data.type === 'error') {
+        orderError.value = data.detail?.message || 'Something went wrong during payment.';
+      }
+    };
+    window.addEventListener('message', checkoutMessageListener);
+  };
+
+  const destroyCheckoutMessageListener = () => {
+    if (checkoutMessageListener) window.removeEventListener('message', checkoutMessageListener);
+    checkoutMessageListener = null;
   };
 
   return {
@@ -689,6 +716,9 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     orderError,
     paymentStatus,
     paymentMessage,
+    checkoutUrl,
+    initCheckoutMessageListener,
+    destroyCheckoutMessageListener,
     startPaymentStatusPolling,
     stopPaymentStatusPolling,
     activeOrder,
