@@ -103,8 +103,20 @@ export default async function handler(request, response) {
       })
     });
     if (!sessionResponse.ok) {
-      const errBody = await sessionResponse.json().catch(() => ({}));
-      throw new Error(errBody.message || 'Could not start the payment gateway session.');
+      const rawBody = await sessionResponse.text();
+      // Logged server-side (Vercel function logs) rather than sent to the browser -- the client
+      // still gets a generic message, but we get the real status/body to diagnose from.
+      console.error('[checkout/create-session] payment_system rejected the session request', {
+        status: sessionResponse.status,
+        statusText: sessionResponse.statusText,
+        body: rawBody.slice(0, 2000)
+      });
+      let parsedMessage;
+      try { parsedMessage = JSON.parse(rawBody)?.message; } catch { /* not JSON */ }
+      if (sessionResponse.status === 401) {
+        throw new Error('Payment gateway session expired. (Merchant token needs refreshing.)');
+      }
+      throw new Error(parsedMessage || 'Could not start the payment gateway session.');
     }
     const { sessionToken, checkoutUrl } = await sessionResponse.json();
 
@@ -142,6 +154,7 @@ export default async function handler(request, response) {
       message: 'Complete your payment to confirm this order.'
     });
   } catch (error) {
+    console.error('[checkout/create-session] failed', error instanceof Error ? error.stack : error);
     return response.status(400).json({ error: error instanceof Error ? error.message : 'Unable to submit order.' });
   }
 }
