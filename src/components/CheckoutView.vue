@@ -291,6 +291,15 @@ onUnmounted(() => store.destroyCheckoutMessageListener());
   <Teleport to="body">
     <div v-if="store.checkoutUrl" class="checkout-dialog-overlay">
       <div class="checkout-dialog-panel">
+        <button
+          type="button"
+          class="checkout-dialog-close"
+          aria-label="Cancel and close payment window"
+          title="Cancel"
+          @click="store.dismissCheckoutDialog()"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
         <iframe
           :src="store.checkoutUrl"
           title="Secure checkout"
@@ -312,6 +321,7 @@ onUnmounted(() => store.destroyCheckoutMessageListener());
   justify-content: stretch;
 }
 .checkout-dialog-panel {
+  position: relative;
   width: 100%;
   height: 100%;
   background: #ffffff;
@@ -322,5 +332,29 @@ onUnmounted(() => store.destroyCheckoutMessageListener());
   height: 100%;
   border: 0;
   flex: 1;
+}
+.checkout-dialog-close {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top, 0px));
+  right: max(12px, env(safe-area-inset-right, 0px));
+  z-index: 1001;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(20, 23, 31, 0.55);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+.checkout-dialog-close:hover {
+  background: rgba(20, 23, 31, 0.75);
+}
+.checkout-dialog-close:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
 }
 </style>

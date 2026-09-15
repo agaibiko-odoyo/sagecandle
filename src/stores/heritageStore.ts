@@ -592,6 +592,15 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     if (paymentStatus.value === 'pending') paymentPollingId = window.setInterval(() => void checkPaymentStatus(), 3000);
   };
 
+  // Lets the shopper close the full-page checkout dialog (CheckoutView's Teleport) without
+  // cancelling the order itself -- the order row and provider session (e.g. an M-Pesa STK
+  // push already sent to their phone) stay live on the backend, so status polling keeps
+  // running in the background in case they complete it after closing the window. Only the
+  // dialog's own UI state is cleared; re-submitting the order opens a fresh session.
+  const dismissCheckoutDialog = () => {
+    checkoutUrl.value = null;
+  };
+
   // Opens a hosted checkout session (payment_system, embedded via <iframe> in CheckoutView)
   // instead of asking the shopper to paste a manual M-Pesa reference. The order is created
   // up-front with status 'awaiting_payment'; checkPaymentStatus() (unchanged) keeps polling
@@ -721,6 +730,7 @@ export const useHeritageStore = defineStore('heritageStore', () => {
     destroyCheckoutMessageListener,
     startPaymentStatusPolling,
     stopPaymentStatusPolling,
+    dismissCheckoutDialog,
     activeOrder,
     orderHistory,
     trackedOrder,
