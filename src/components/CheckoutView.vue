@@ -1,10 +1,22 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { useHeritageStore } from '../stores/heritageStore';
 import { ArrowLeft, Wallet } from 'lucide-vue-next';
 
 const store = useHeritageStore();
 const shippingForm = ref<HTMLFormElement | null>(null);
+
+// Lock the page's own scroll while the full-page checkout dialog is open, since the dialog
+// itself now owns the whole viewport (see the Teleport at the bottom of this component).
+watch(
+  () => store.checkoutUrl,
+  (url) => {
+    document.body.style.overflow = url ? 'hidden' : '';
+  }
+);
+onUnmounted(() => {
+  document.body.style.overflow = '';
+});
 
 const setView = (view: 'home' | 'curated' | 'heritage' | 'profile' | 'cart' | 'checkout' | 'confirmation') => store.navigateTo(view);
 
@@ -188,17 +200,12 @@ onUnmounted(() => store.destroyCheckoutMessageListener());
           </div>
         </div>
 
-        <!-- Hosted checkout: appears once an order + payment session have been created. -->
+        <!-- Hosted checkout: a full-page dialog opens (via Teleport, below) once an order +
+             payment session have been created. This placeholder just keeps the payment-status
+             message visible in the page flow underneath. -->
         <div class="space-y-4" v-else>
           <h2 class="font-serif text-xl border-b border-gold-100 dark:border-gold-950 pb-2">Complete Payment</h2>
-          <div class="rounded-lg border border-gold-300/70 dark:border-gold-800 overflow-hidden bg-white dark:bg-luxe-gray">
-            <iframe
-              :src="store.checkoutUrl"
-              title="Secure checkout"
-              class="w-full"
-              style="height: 480px; border: 0;"
-            ></iframe>
-          </div>
+          <p class="text-xs text-neutral-500 dark:text-neutral-400">Your secure payment window is open.</p>
           <p v-if="store.paymentMessage" class="text-xs text-neutral-500 dark:text-neutral-400">{{ store.paymentMessage }}</p>
         </div>
 
@@ -277,4 +284,55 @@ onUnmounted(() => store.destroyCheckoutMessageListener());
       </div>
     </div>
   </div>
+
+  <!-- Full-page checkout dialog: teleported to <body> so it escapes this view's own layout
+       and stacking context, and covers the whole viewport rather than sitting inline in the
+       page (reduces scrolling -- the shopper sees the whole payment UI at once). -->
+  <Teleport to="body">
+    <div v-if="store.checkoutUrl" class="checkout-dialog-overlay">
+      <div class="checkout-dialog-panel">
+        <iframe
+          :src="store.checkoutUrl"
+          title="Secure checkout"
+          class="checkout-dialog-iframe"
+        ></iframe>
+      </div>
+    </div>
+  </Teleport>
 </template>
+
+<style scoped>
+.checkout-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(15, 13, 10, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.checkout-dialog-panel {
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  display: flex;
+}
+.checkout-dialog-iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  flex: 1;
+}
+@media (min-width: 640px) {
+  .checkout-dialog-overlay { padding: 24px; }
+  .checkout-dialog-panel {
+    width: 100%;
+    max-width: 480px;
+    height: min(760px, 100%);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  }
+}
+</style>
