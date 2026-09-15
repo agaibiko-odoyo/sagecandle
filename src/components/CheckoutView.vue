@@ -301,16 +301,15 @@ onUnmounted(() => store.destroyCheckoutMessageListener());
   </Teleport>
 </template>
 
-<style scoped>
+<style>
 .checkout-dialog-overlay {
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: rgba(15, 13, 10, 0.55);
+  background: #ffffff;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
+  align-items: stretch;
+  justify-content: stretch;
 }
 .checkout-dialog-panel {
   width: 100%;
@@ -323,16 +322,5 @@ onUnmounted(() => store.destroyCheckoutMessageListener());
   height: 100%;
   border: 0;
   flex: 1;
-}
-@media (min-width: 640px) {
-  .checkout-dialog-overlay { padding: 24px; }
-  .checkout-dialog-panel {
-    width: 100%;
-    max-width: 480px;
-    height: min(760px, 100%);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
-  }
 }
 </style>
